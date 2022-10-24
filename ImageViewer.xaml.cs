@@ -361,5 +361,85 @@ namespace Stereoscopia
 
         #endregion
 
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                    // Zoom In
+                    if (Locked && _imageSlave.Locked)
+                    {
+                        ScaleTransform st = new ScaleTransform();
+                        st.ScaleX += .2;
+                        st.ScaleY += .2;
+                        //myimg.RenderTransformOrigin = new Point(myimg.ActualHeight / 2, myimg.ActualHeight / 2);
+                        if (myimg.RenderTransform is TransformGroup)
+                        {
+                            ((TransformGroup)myimg.RenderTransform).Children.Add(st);
+                        }
+                        else
+                        {
+                            TransformGroup myTransformGroup = new TransformGroup();
+                            myTransformGroup.Children.Add(st);
+                            myimg.RenderTransform = myTransformGroup;
+                        }
+
+                        if (Locked && _imageSlave != null && _imageSlave.Locked)
+                            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                            {
+                                _imageSlave.ZoomIn();
+                            }));
+                    }
+                    break;
+                case Key.Down:
+                    // Zoom Out
+                    if (Locked && _imageSlave.Locked)
+                    {
+                        ScaleTransform st = new ScaleTransform();
+                        st.ScaleX -= .2;
+                        st.ScaleY -= .2;
+
+                        if (myimg.RenderTransform is TransformGroup)
+                        {
+                            ((TransformGroup)myimg.RenderTransform).Children.Add(st);
+                        }
+                        else
+                        {
+                            TransformGroup myTransformGroup = new TransformGroup();
+                            myTransformGroup.Children.Add(st);
+                            myimg.RenderTransform = myTransformGroup;
+                        }
+
+                        if (Locked && _imageSlave != null && _imageSlave.Locked)
+                            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                            {
+                                _imageSlave.ZoomOut();
+                            }));
+                    }
+                    break;
+                case Key.L:
+                    if (Locked)
+                    {
+                        btnUnLock.Visibility = Visibility.Collapsed;
+                        btnLock.Visibility = Visibility.Visible;
+                        btnZoomOut.IsEnabled = btnZoomIn.IsEnabled = false;
+                        btnUnLockSlave.Visibility = Visibility.Collapsed;
+                        btnLockSlave.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        btnUnLock.Visibility = Visibility.Visible;
+                        btnLock.Visibility = Visibility.Collapsed;
+                        btnZoomOut.IsEnabled = btnZoomIn.IsEnabled = true;
+                        btnUnLockSlave.Visibility = Visibility.Visible;
+                        btnLockSlave.Visibility = Visibility.Collapsed;
+                    }
+                    _imageSlave.Lock();
+                    Locked = !Locked;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }

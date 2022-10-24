@@ -45,6 +45,8 @@ namespace Stereoscopia
                     img.LostMouseCapture += new MouseEventHandler(myimg_LostMouseCapture);
                     img.SetValue(Canvas.LeftProperty, 0.0);
                     img.SetValue(Canvas.TopProperty, 0.0);
+
+                    FlipH();
                 }
                 catch
                 { }
