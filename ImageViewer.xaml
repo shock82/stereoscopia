@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:Stereoscopia"
     mc:Ignorable="d" MouseWheel="Window_MouseWheel"
-    KeyUp="Window_KeyUp"
+    KeyUp="Window_KeyUp" MouseRightButtonUp="Window_MouseRightButtonUp"
     Title="Image Viewer Master" Height="450" Width="800">
     <Grid>
         <!--<Canvas x:Name="mycanv">

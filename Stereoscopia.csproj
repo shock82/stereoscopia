@@ -129,5 +129,8 @@
     <Resource Include="Images\flip_v.png" />
     <Resource Include="Images\flip_h.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Logo_INGV.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

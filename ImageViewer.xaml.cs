@@ -24,6 +24,7 @@ namespace Stereoscopia
         private int angle = 0;
 
         private ImageViewerSlave _imageSlave;
+        private System.Drawing.Bitmap _bitmap;
 
         #endregion
 
@@ -32,7 +33,12 @@ namespace Stereoscopia
         public ImageViewer(string imagePath, ImageViewerSlave slave)
         {
             InitializeComponent();
-            myimg.Source = new BitmapImage(new Uri(imagePath));
+            //myimg.Source = new BitmapImage(new Uri(imagePath));
+            _bitmap = new System.Drawing.Bitmap(imagePath);
+            IntPtr hBitmap = _bitmap.GetHbitmap();
+            System.Windows.Media.ImageSource WpfBitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            myimg.Source = WpfBitmap;
+
             Locked = false;
             _imageSlave = slave;
 
@@ -166,150 +172,146 @@ namespace Stereoscopia
 
         private void btnRotate_Click(object sender, RoutedEventArgs e)
         {
-            angle = angle + 90;
-            RotateTransform rotateTransform = new RotateTransform(angle);
-            TranslateTransform translateTransform = new TranslateTransform();
-            switch (angle)
-            {
-                case 90:
-                    translateTransform.X = myimg.ActualHeight;
-                    break;
-                case 180:
-                    translateTransform.Y = myimg.ActualHeight;
-                    translateTransform.X = myimg.ActualWidth;
-                    break;
-                case 270:
-                    translateTransform.Y = myimg.ActualWidth;
-                    break;
-            }
-            if (angle == 360) angle = 0;
-            TransformGroup myTransformGroup = new TransformGroup();
-            myTransformGroup.Children.Add(rotateTransform);
-            myTransformGroup.Children.Add(translateTransform);
-            //myimg.RenderTransformOrigin = new Point(0.5, 0.5);
-            myimg.RenderTransform = myTransformGroup;
+            System.Drawing.Image image = System.Drawing.Image.FromHbitmap(_bitmap.GetHbitmap());
+            image.RotateFlip(System.Drawing.RotateFlipType.Rotate90FlipNone);
 
-            //Point centerPoint = new Point();
+            _bitmap = new System.Drawing.Bitmap(image);
+            IntPtr hBitmap = _bitmap.GetHbitmap();
+            System.Windows.Media.ImageSource WpfBitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            myimg.Source = WpfBitmap;
+
+            //angle = angle + 90;
+            //RotateTransform rotateTransform = new RotateTransform(angle);
+            //TranslateTransform translateTransform = new TranslateTransform();
             //switch (angle)
             //{
-            //    case 0: centerPoint = new Point(myimg.ActualHeight / 2, myimg.ActualHeight / 2); break;
-            //    case 90: centerPoint = new Point(myimg.ActualWidth / 2, myimg.ActualHeight / 2); break;
-            //    case 180: centerPoint = new Point(myimg.ActualWidth / 2, myimg.ActualWidth / 2); break;
-            //    default: break;
+            //    case 90:
+            //        translateTransform.X = myimg.ActualHeight;
+            //        break;
+            //    case 180:
+            //        translateTransform.Y = myimg.ActualHeight;
+            //        translateTransform.X = myimg.ActualWidth;
+            //        break;
+            //    case 270:
+            //        translateTransform.Y = myimg.ActualWidth;
+            //        break;
             //}
-            //angle = angle + 90;
             //if (angle == 360) angle = 0;
-            //RotateTransform rotateTransform = new RotateTransform(angle) { CenterX = centerPoint.X, CenterY = centerPoint.Y };
-            //myimg.RenderTransform = rotateTransform;
+            //TransformGroup myTransformGroup = new TransformGroup();
+            //myTransformGroup.Children.Add(rotateTransform);
+            //myTransformGroup.Children.Add(translateTransform);
+            //myimg.RenderTransform = myTransformGroup;
         }
         
         private void btnZoomIn_Click(object sender, RoutedEventArgs e)
         {
-            if (Locked && _imageSlave.Locked)
-            {
-                ScaleTransform st = new ScaleTransform();
-                st.ScaleX += .2;
-                st.ScaleY += .2;
-                //myimg.RenderTransformOrigin = new Point(myimg.ActualHeight / 2, myimg.ActualHeight / 2);
-                if (myimg.RenderTransform is TransformGroup)
-                {
-                    ((TransformGroup)myimg.RenderTransform).Children.Add(st);
-                }
-                else
-                {
-                    TransformGroup myTransformGroup = new TransformGroup();
-                    myTransformGroup.Children.Add(st);
-                    myimg.RenderTransform = myTransformGroup;
-                }
-
-                if (Locked && _imageSlave != null && _imageSlave.Locked)
-                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-                    {
-                        _imageSlave.ZoomIn();
-                    }));
-            }
+            ZoomIn();
         }
 
         private void btnZoomOut_Click(object sender, RoutedEventArgs e)
         {
-            if (Locked && _imageSlave.Locked)
-            {
-                ScaleTransform st = new ScaleTransform();
-                st.ScaleX -= .2;
-                st.ScaleY -= .2;
-
-                if (myimg.RenderTransform is TransformGroup)
-                {
-                    ((TransformGroup)myimg.RenderTransform).Children.Add(st);
-                }
-                else
-                {
-                    TransformGroup myTransformGroup = new TransformGroup();
-                    myTransformGroup.Children.Add(st);
-                    myimg.RenderTransform = myTransformGroup;
-                }
-
-                if (Locked && _imageSlave != null && _imageSlave.Locked)
-                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-                    {
-                        _imageSlave.ZoomOut();
-                    }));
-            }
+            ZoomOut();
         }
 
         private void Window_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (Locked && _imageSlave.Locked)
-            {
-                Point p = viewfinder.TranslatePoint(new Point(0, 0), myimg);
+            if (e.Delta > 0)
+                ZoomIn();
+            else
+                ZoomOut();
 
-                Matrix m = myimg.RenderTransform.Value;
-                if (e.Delta > 0)
-                    m.ScaleAtPrepend(1.1, 1.1, p.X, p.Y);
-                else
-                    m.ScaleAtPrepend(1 / 1.1, 1 / 1.1, p.X, p.Y);
+            //if (Locked && _imageSlave.Locked)
+            //{
+            //    Point p = viewfinder.TranslatePoint(new Point(0, 0), myimg);
 
-                myimg.RenderTransform = new MatrixTransform(m);
+            //    Matrix m = myimg.RenderTransform.Value;
+            //    if (e.Delta > 0)
+            //        m.ScaleAtPrepend(1.1, 1.1, p.X, p.Y);
+            //    else
+            //        m.ScaleAtPrepend(1 / 1.1, 1 / 1.1, p.X, p.Y);
 
-                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-                {
-                    _imageSlave.Window_MouseWheel(e.Delta);
-                }));
-            }
+            //    myimg.RenderTransform = new MatrixTransform(m);
+
+            //    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+            //    {
+            //        _imageSlave.Window_MouseWheel(e.Delta);
+            //    }));
+            //}
         }
 
         private void btnFlipH_Click(object sender, RoutedEventArgs e)
         {
-            myimg.RenderTransformOrigin = new Point(0.5, 0.5);
-            ScaleTransform flipTrans = new ScaleTransform();
-            flipTrans.ScaleX = -1;
-            if (myimg.RenderTransform is TransformGroup)
-            {
-                ((TransformGroup)myimg.RenderTransform).Children.Add(flipTrans);
-            }
-            else
-            {
-                TransformGroup myTransformGroup = new TransformGroup();
-                myTransformGroup.Children.Add(flipTrans);
-                myimg.RenderTransform = myTransformGroup;
-            }
+            System.Drawing.Image image = System.Drawing.Image.FromHbitmap(_bitmap.GetHbitmap());
+            image.RotateFlip(System.Drawing.RotateFlipType.RotateNoneFlipX);
+
+            _bitmap = new System.Drawing.Bitmap(image);
+            IntPtr hBitmap = _bitmap.GetHbitmap();
+            System.Windows.Media.ImageSource WpfBitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            myimg.Source = WpfBitmap;
+
+            //myimg.RenderTransformOrigin = new Point(0.5, 0.5);
+            //ScaleTransform flipTrans = new ScaleTransform();
+            //flipTrans.ScaleX = -1;
+            //if (myimg.RenderTransform is TransformGroup)
+            //{
+            //    ((TransformGroup)myimg.RenderTransform).Children.Add(flipTrans);
+            //}
+            //else
+            //{
+            //    TransformGroup myTransformGroup = new TransformGroup();
+            //    myTransformGroup.Children.Add(flipTrans);
+            //    myimg.RenderTransform = myTransformGroup;
+            //}
         }
 
         private void btnFlipV_Click(object sender, RoutedEventArgs e)
         {
-            myimg.RenderTransformOrigin = new Point(0.5, 0.5);
-            ScaleTransform flipTrans = new ScaleTransform();
-            flipTrans.ScaleY = -1;
-            if (myimg.RenderTransform is TransformGroup)
+            System.Drawing.Image image = System.Drawing.Image.FromHbitmap(_bitmap.GetHbitmap());
+            image.RotateFlip(System.Drawing.RotateFlipType.RotateNoneFlipY);
+
+            _bitmap = new System.Drawing.Bitmap(image);
+            IntPtr hBitmap = _bitmap.GetHbitmap();
+            System.Windows.Media.ImageSource WpfBitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            myimg.Source = WpfBitmap;
+
+            //myimg.RenderTransformOrigin = new Point(0.5, 0.5);
+            //ScaleTransform flipTrans = new ScaleTransform();
+            //flipTrans.ScaleY = -1;
+            //if (myimg.RenderTransform is TransformGroup)
+            //{
+            //    ((TransformGroup)myimg.RenderTransform).Children.Add(flipTrans);
+            //}
+            //else
+            //{
+            //    TransformGroup myTransformGroup = new TransformGroup();
+            //    myTransformGroup.Children.Add(flipTrans);
+            //    myimg.RenderTransform = myTransformGroup;
+            //}
+        }
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
             {
-                ((TransformGroup)myimg.RenderTransform).Children.Add(flipTrans);
+                case Key.Up:
+                    // Zoom In
+                    ZoomIn();
+                    break;
+                case Key.Down:
+                    // Zoom Out
+                    ZoomOut();
+                    break;
+                case Key.L:
+                    LockAll();
+                    break;
+                default:
+                    break;
             }
-            else
-            {
-                TransformGroup myTransformGroup = new TransformGroup();
-                myTransformGroup.Children.Add(flipTrans);
-                myimg.RenderTransform = myTransformGroup;
-            }
+        }
+
+        private void Window_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            LockAll();
         }
 
         private void btnRotateSlave_Click(object sender, RoutedEventArgs e)
@@ -344,6 +346,98 @@ namespace Stereoscopia
 
         #endregion
 
+        #region Public Methods
+
+        public void ZoomIn()
+        {
+            if (Locked && _imageSlave.Locked)
+            {
+                Point p = viewfinder.TranslatePoint(new Point(0, 0), myimg);
+
+                Matrix m = myimg.RenderTransform.Value;
+                m.ScaleAtPrepend(1.1, 1.1, p.X, p.Y);
+                myimg.RenderTransform = new MatrixTransform(m);
+
+                /*ScaleTransform st = new ScaleTransform();
+                st.ScaleX += .2;
+                st.ScaleY += .2;
+                //myimg.RenderTransformOrigin = new Point(myimg.ActualHeight / 2, myimg.ActualHeight / 2);
+                if (myimg.RenderTransform is TransformGroup)
+                {
+                    ((TransformGroup)myimg.RenderTransform).Children.Add(st);
+                }
+                else
+                {
+                    TransformGroup myTransformGroup = new TransformGroup();
+                    myTransformGroup.Children.Add(st);
+                    myimg.RenderTransform = myTransformGroup;
+                }*/
+
+                if (Locked && _imageSlave != null && _imageSlave.Locked)
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                    {
+                        _imageSlave.ZoomIn();
+                    }));
+            }
+        }
+
+        public void ZoomOut()
+        {
+            if (Locked && _imageSlave.Locked)
+            {
+                Point p = viewfinder.TranslatePoint(new Point(0, 0), myimg);
+
+                Matrix m = myimg.RenderTransform.Value;
+                m.ScaleAtPrepend(1 / 1.1, 1 / 1.1, p.X, p.Y);
+                myimg.RenderTransform = new MatrixTransform(m);
+
+                /*ScaleTransform st = new ScaleTransform();
+                st.ScaleX -= .2;
+                st.ScaleY -= .2;
+                //myimg.RenderTransformOrigin = new Point(myimg.ActualHeight / 2, myimg.ActualHeight / 2);
+                if (myimg.RenderTransform is TransformGroup)
+                {
+                    ((TransformGroup)myimg.RenderTransform).Children.Add(st);
+                }
+                else
+                {
+                    TransformGroup myTransformGroup = new TransformGroup();
+                    myTransformGroup.Children.Add(st);
+                    myimg.RenderTransform = myTransformGroup;
+                }*/
+
+                if (Locked && _imageSlave != null && _imageSlave.Locked)
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                    {
+                        _imageSlave.ZoomOut();
+                    }));
+            }
+        }
+
+        public void LockAll()
+        {
+            if (Locked)
+            {
+                btnUnLock.Visibility = Visibility.Collapsed;
+                btnLock.Visibility = Visibility.Visible;
+                btnZoomOut.IsEnabled = btnZoomIn.IsEnabled = false;
+                btnUnLockSlave.Visibility = Visibility.Collapsed;
+                btnLockSlave.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                btnUnLock.Visibility = Visibility.Visible;
+                btnLock.Visibility = Visibility.Collapsed;
+                btnZoomOut.IsEnabled = btnZoomIn.IsEnabled = true;
+                btnUnLockSlave.Visibility = Visibility.Visible;
+                btnLockSlave.Visibility = Visibility.Collapsed;
+            }
+            _imageSlave.Lock();
+            Locked = !Locked;
+        }
+
+        #endregion
+
         #region Properties
 
         public bool Locked
@@ -359,87 +453,8 @@ namespace Stereoscopia
         }
 
 
+
         #endregion
 
-        private void Window_KeyUp(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Up:
-                    // Zoom In
-                    if (Locked && _imageSlave.Locked)
-                    {
-                        ScaleTransform st = new ScaleTransform();
-                        st.ScaleX += .2;
-                        st.ScaleY += .2;
-                        //myimg.RenderTransformOrigin = new Point(myimg.ActualHeight / 2, myimg.ActualHeight / 2);
-                        if (myimg.RenderTransform is TransformGroup)
-                        {
-                            ((TransformGroup)myimg.RenderTransform).Children.Add(st);
-                        }
-                        else
-                        {
-                            TransformGroup myTransformGroup = new TransformGroup();
-                            myTransformGroup.Children.Add(st);
-                            myimg.RenderTransform = myTransformGroup;
-                        }
-
-                        if (Locked && _imageSlave != null && _imageSlave.Locked)
-                            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-                            {
-                                _imageSlave.ZoomIn();
-                            }));
-                    }
-                    break;
-                case Key.Down:
-                    // Zoom Out
-                    if (Locked && _imageSlave.Locked)
-                    {
-                        ScaleTransform st = new ScaleTransform();
-                        st.ScaleX -= .2;
-                        st.ScaleY -= .2;
-
-                        if (myimg.RenderTransform is TransformGroup)
-                        {
-                            ((TransformGroup)myimg.RenderTransform).Children.Add(st);
-                        }
-                        else
-                        {
-                            TransformGroup myTransformGroup = new TransformGroup();
-                            myTransformGroup.Children.Add(st);
-                            myimg.RenderTransform = myTransformGroup;
-                        }
-
-                        if (Locked && _imageSlave != null && _imageSlave.Locked)
-                            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-                            {
-                                _imageSlave.ZoomOut();
-                            }));
-                    }
-                    break;
-                case Key.L:
-                    if (Locked)
-                    {
-                        btnUnLock.Visibility = Visibility.Collapsed;
-                        btnLock.Visibility = Visibility.Visible;
-                        btnZoomOut.IsEnabled = btnZoomIn.IsEnabled = false;
-                        btnUnLockSlave.Visibility = Visibility.Collapsed;
-                        btnLockSlave.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        btnUnLock.Visibility = Visibility.Visible;
-                        btnLock.Visibility = Visibility.Collapsed;
-                        btnZoomOut.IsEnabled = btnZoomIn.IsEnabled = true;
-                        btnUnLockSlave.Visibility = Visibility.Visible;
-                        btnLockSlave.Visibility = Visibility.Collapsed;
-                    }
-                    _imageSlave.Lock();
-                    Locked = !Locked;
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 }

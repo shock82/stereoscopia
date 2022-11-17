@@ -5,8 +5,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:Stereoscopia"
-    mc:Ignorable="d"
-    Title="MainWindow" Height="450" Width="800">
+    mc:Ignorable="d" WindowStartupLocation="CenterScreen"
+    Title="Stereoscopia" Height="450" Width="800">
     <Grid Margin="30">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="120"/>
@@ -16,18 +16,29 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="36"/>
             <RowDefinition Height="36"/>
+            <RowDefinition Height="36"/>
+            <RowDefinition Height="100"/>
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Label Content="Immagine 1" VerticalAlignment="Center"/>
-        <TextBox x:Name="txbImg1" IsReadOnly="True" Grid.Column="1" Height="26"/>
-        <Button x:Name="btnImg1" Content="..." Click="btnImg1_Click" Grid.Column="2" Height="26"/>
-        
-        <Label Content="Immagine 2" VerticalAlignment="Center" Grid.Row="1"/>
-        <TextBox x:Name="txbImg2" IsReadOnly="True" Grid.Row="1" Grid.Column="1" Height="26"/>
-        <Button x:Name="btnImg2" Content="..." Click="btnImg2_Click" Grid.Row="1" Grid.Column="2" Height="26"/>
+        <Label Content="Scegliere le due immagini da visualizzare" VerticalAlignment="Center" Grid.ColumnSpan="3"/>
 
-        <Button x:Name="start" Content="Avvia" Click="start_Click" Grid.Row="2" Grid.Column="1" Width="80" Height="26"/>
+        <Label Content="Immagine 1" VerticalAlignment="Center" Grid.Row="1"/>
+        <TextBox x:Name="txbImg1" IsReadOnly="True" Grid.Row="1" Grid.Column="1" Height="26"/>
+        <Button x:Name="btnImg1" Content="..." Click="btnImg1_Click" Grid.Row="1" Grid.Column="2" Height="26"/>
 
+        <Label Content="Immagine 2" VerticalAlignment="Center" Grid.Row="2"/>
+        <TextBox x:Name="txbImg2" IsReadOnly="True" Grid.Row="2" Grid.Column="1" Height="26"/>
+        <Button x:Name="btnImg2" Content="..." Click="btnImg2_Click" Grid.Row="2" Grid.Column="2" Height="26"/>
 
+        <Button x:Name="start" Content="Avvia" Click="start_Click" Grid.Row="3" Grid.Column="1" Width="80" Height="26"/>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Grid.ColumnSpan="3" VerticalAlignment="Bottom">
+            <Image Source="Images/Logo_INGV.png" Grid.Row="4" VerticalAlignment="Bottom"/>
+            <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Vertical" VerticalAlignment="Bottom" Margin="50 0 0 0">
+                <Label Content="Sviluppato da Sergio Falcone"/>
+                <Label Content="Per informazioni, commenti e/o suggerimenti scrivere a"/>
+                <Label Content="sergio.falcone@ingv.it"/>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Window>

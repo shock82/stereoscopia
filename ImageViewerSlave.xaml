@@ -4,8 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:Stereoscopia" 
-    mc:Ignorable="d"
+    xmlns:local="clr-namespace:Stereoscopia" mc:Ignorable="d" 
+    MouseRightButtonUp="Window_MouseRightButtonUp" KeyUp="Window_KeyUp" MouseWheel="Window_MouseWheel_1"
     Title="Image Viewer Slave">
     <Grid>
         <!--<Canvas x:Name="mycanv">
@@ -29,6 +29,6 @@
                 </Button>
             </StackPanel>
         </Border>-->
-        <TextBlock x:Name="viewFinder" Text="+" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red"/>
+        <TextBlock x:Name="viewFinderSlave" Text="+" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red"/>
     </Grid>
 </Window>

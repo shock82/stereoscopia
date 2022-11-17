@@ -48,6 +48,7 @@ namespace Stereoscopia
             }
             ImageViewerSlave ivSlave = new ImageViewerSlave(_fileImage2);
             ImageViewer ivMaster = new ImageViewer(_fileImage1, ivSlave);
+            ivSlave.ImageMaster = ivMaster;
 
             Screen s1 = Screen.AllScreens[0];
             Screen s2 = Screen.AllScreens[1];
