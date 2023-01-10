@@ -3,7 +3,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -24,7 +23,6 @@ namespace Stereoscopia
         private int angle = 0;
 
         private ImageViewerSlave _imageSlave;
-        private System.Drawing.Bitmap _bitmap;
 
         #endregion
 
@@ -33,11 +31,7 @@ namespace Stereoscopia
         public ImageViewer(string imagePath, ImageViewerSlave slave)
         {
             InitializeComponent();
-            //myimg.Source = new BitmapImage(new Uri(imagePath));
-            _bitmap = new System.Drawing.Bitmap(imagePath);
-            IntPtr hBitmap = _bitmap.GetHbitmap();
-            System.Windows.Media.ImageSource WpfBitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            myimg.Source = WpfBitmap;
+            myimg.Source = new BitmapImage(new Uri(imagePath));
 
             Locked = false;
             _imageSlave = slave;
@@ -93,26 +87,6 @@ namespace Stereoscopia
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => {
                     _imageSlave.MouseCaptured = false;  //_imageSlave.MouseUp();
                 }));
-
-            //mouseClick = e.GetPosition(null);
-
-            //canvasLeft = Canvas.GetLeft(((Image)sender));
-            //canvasTop = Canvas.GetTop(((Image)sender));
-
-            //if (canvasLeft < 0)
-            //    canvasLeft = 0;
-
-            //if (canvasTop < 0)
-            //    canvasTop = 0;
-
-            //if (canvasLeft > mycanv.ActualWidth)
-            //    canvasLeft = mycanv.ActualWidth - ((Image)sender).ActualWidth;
-
-            //if (canvasTop > mycanv.ActualHeight)
-            //    canvasTop = mycanv.ActualHeight - ((Image)sender).ActualHeight;
-
-            //((Image)sender).SetValue(Canvas.LeftProperty, canvasLeft);
-            //((Image)sender).SetValue(Canvas.TopProperty, canvasTop);
         }
 
         public void myimg_MouseMove(object sender, MouseEventArgs e)
@@ -172,35 +146,8 @@ namespace Stereoscopia
 
         private void btnRotate_Click(object sender, RoutedEventArgs e)
         {
-            System.Drawing.Image image = System.Drawing.Image.FromHbitmap(_bitmap.GetHbitmap());
-            image.RotateFlip(System.Drawing.RotateFlipType.Rotate90FlipNone);
-
-            _bitmap = new System.Drawing.Bitmap(image);
-            IntPtr hBitmap = _bitmap.GetHbitmap();
-            System.Windows.Media.ImageSource WpfBitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            myimg.Source = WpfBitmap;
-
-            //angle = angle + 90;
-            //RotateTransform rotateTransform = new RotateTransform(angle);
-            //TranslateTransform translateTransform = new TranslateTransform();
-            //switch (angle)
-            //{
-            //    case 90:
-            //        translateTransform.X = myimg.ActualHeight;
-            //        break;
-            //    case 180:
-            //        translateTransform.Y = myimg.ActualHeight;
-            //        translateTransform.X = myimg.ActualWidth;
-            //        break;
-            //    case 270:
-            //        translateTransform.Y = myimg.ActualWidth;
-            //        break;
-            //}
-            //if (angle == 360) angle = 0;
-            //TransformGroup myTransformGroup = new TransformGroup();
-            //myTransformGroup.Children.Add(rotateTransform);
-            //myTransformGroup.Children.Add(translateTransform);
-            //myimg.RenderTransform = myTransformGroup;
+            angle = angle + 90;
+            rotateView.Angle = angle;
         }
         
         private void btnZoomIn_Click(object sender, RoutedEventArgs e)
@@ -219,74 +166,22 @@ namespace Stereoscopia
                 ZoomIn();
             else
                 ZoomOut();
-
-            //if (Locked && _imageSlave.Locked)
-            //{
-            //    Point p = viewfinder.TranslatePoint(new Point(0, 0), myimg);
-
-            //    Matrix m = myimg.RenderTransform.Value;
-            //    if (e.Delta > 0)
-            //        m.ScaleAtPrepend(1.1, 1.1, p.X, p.Y);
-            //    else
-            //        m.ScaleAtPrepend(1 / 1.1, 1 / 1.1, p.X, p.Y);
-
-            //    myimg.RenderTransform = new MatrixTransform(m);
-
-            //    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-            //    {
-            //        _imageSlave.Window_MouseWheel(e.Delta);
-            //    }));
-            //}
         }
 
         private void btnFlipH_Click(object sender, RoutedEventArgs e)
         {
-            System.Drawing.Image image = System.Drawing.Image.FromHbitmap(_bitmap.GetHbitmap());
-            image.RotateFlip(System.Drawing.RotateFlipType.RotateNoneFlipX);
-
-            _bitmap = new System.Drawing.Bitmap(image);
-            IntPtr hBitmap = _bitmap.GetHbitmap();
-            System.Windows.Media.ImageSource WpfBitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            myimg.Source = WpfBitmap;
-
-            //myimg.RenderTransformOrigin = new Point(0.5, 0.5);
-            //ScaleTransform flipTrans = new ScaleTransform();
-            //flipTrans.ScaleX = -1;
-            //if (myimg.RenderTransform is TransformGroup)
-            //{
-            //    ((TransformGroup)myimg.RenderTransform).Children.Add(flipTrans);
-            //}
-            //else
-            //{
-            //    TransformGroup myTransformGroup = new TransformGroup();
-            //    myTransformGroup.Children.Add(flipTrans);
-            //    myimg.RenderTransform = myTransformGroup;
-            //}
+            if (angle > 0 && ((angle/90) % 2 != 0))
+                scaleV.ScaleY *= -1;
+            else
+                scaleH.ScaleX *= -1;
         }
 
         private void btnFlipV_Click(object sender, RoutedEventArgs e)
         {
-            System.Drawing.Image image = System.Drawing.Image.FromHbitmap(_bitmap.GetHbitmap());
-            image.RotateFlip(System.Drawing.RotateFlipType.RotateNoneFlipY);
-
-            _bitmap = new System.Drawing.Bitmap(image);
-            IntPtr hBitmap = _bitmap.GetHbitmap();
-            System.Windows.Media.ImageSource WpfBitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            myimg.Source = WpfBitmap;
-
-            //myimg.RenderTransformOrigin = new Point(0.5, 0.5);
-            //ScaleTransform flipTrans = new ScaleTransform();
-            //flipTrans.ScaleY = -1;
-            //if (myimg.RenderTransform is TransformGroup)
-            //{
-            //    ((TransformGroup)myimg.RenderTransform).Children.Add(flipTrans);
-            //}
-            //else
-            //{
-            //    TransformGroup myTransformGroup = new TransformGroup();
-            //    myTransformGroup.Children.Add(flipTrans);
-            //    myimg.RenderTransform = myTransformGroup;
-            //}
+            if (angle > 0 && ((angle/90) % 2 != 0))
+                scaleH.ScaleX *= -1;
+            else
+                scaleV.ScaleY *= -1;
         }
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
@@ -352,26 +247,8 @@ namespace Stereoscopia
         {
             if (Locked && _imageSlave.Locked)
             {
-                Point p = viewfinder.TranslatePoint(new Point(0, 0), myimg);
-
-                Matrix m = myimg.RenderTransform.Value;
-                m.ScaleAtPrepend(1.1, 1.1, p.X, p.Y);
-                myimg.RenderTransform = new MatrixTransform(m);
-
-                /*ScaleTransform st = new ScaleTransform();
-                st.ScaleX += .2;
-                st.ScaleY += .2;
-                //myimg.RenderTransformOrigin = new Point(myimg.ActualHeight / 2, myimg.ActualHeight / 2);
-                if (myimg.RenderTransform is TransformGroup)
-                {
-                    ((TransformGroup)myimg.RenderTransform).Children.Add(st);
-                }
-                else
-                {
-                    TransformGroup myTransformGroup = new TransformGroup();
-                    myTransformGroup.Children.Add(st);
-                    myimg.RenderTransform = myTransformGroup;
-                }*/
+                zoomView.ScaleX += .2;
+                zoomView.ScaleY += .2;
 
                 if (Locked && _imageSlave != null && _imageSlave.Locked)
                     Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
@@ -385,26 +262,8 @@ namespace Stereoscopia
         {
             if (Locked && _imageSlave.Locked)
             {
-                Point p = viewfinder.TranslatePoint(new Point(0, 0), myimg);
-
-                Matrix m = myimg.RenderTransform.Value;
-                m.ScaleAtPrepend(1 / 1.1, 1 / 1.1, p.X, p.Y);
-                myimg.RenderTransform = new MatrixTransform(m);
-
-                /*ScaleTransform st = new ScaleTransform();
-                st.ScaleX -= .2;
-                st.ScaleY -= .2;
-                //myimg.RenderTransformOrigin = new Point(myimg.ActualHeight / 2, myimg.ActualHeight / 2);
-                if (myimg.RenderTransform is TransformGroup)
-                {
-                    ((TransformGroup)myimg.RenderTransform).Children.Add(st);
-                }
-                else
-                {
-                    TransformGroup myTransformGroup = new TransformGroup();
-                    myTransformGroup.Children.Add(st);
-                    myimg.RenderTransform = myTransformGroup;
-                }*/
+                zoomView.ScaleX -= .2;
+                zoomView.ScaleY -= .2;
 
                 if (Locked && _imageSlave != null && _imageSlave.Locked)
                     Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>

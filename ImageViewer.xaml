@@ -9,12 +9,23 @@
     KeyUp="Window_KeyUp" MouseRightButtonUp="Window_MouseRightButtonUp"
     Title="Image Viewer Master" Height="450" Width="800">
     <Grid>
-        <!--<Canvas x:Name="mycanv">
-            <Image x:Name="myimg"/>
-        </Canvas>-->
         <Border>
-            <Canvas Name="mycanv">
-                <Image x:Name="myimg" Width="{Binding Path=ActualWidth, ElementName=mycanv}" Height="{Binding Path=ActualHeight, ElementName=mycanv}" Stretch="Uniform"/>
+            <Canvas x:Name="mycanv" RenderTransformOrigin=".5,.5">
+                <Canvas.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="zoomView" ScaleX="1" ScaleY="1" />
+                    </TransformGroup>
+                </Canvas.RenderTransform>
+                <Image x:Name="myimg" Width="{Binding Path=ActualWidth, ElementName=mycanv}" Height="{Binding Path=ActualHeight, ElementName=mycanv}" Stretch="Uniform"
+                       RenderTransformOrigin=".5,.5">
+                    <Image.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform x:Name="scaleH" ScaleX="1" />
+                            <ScaleTransform x:Name="scaleV" ScaleY="1" />
+                            <RotateTransform x:Name="rotateView" Angle="0" />
+                        </TransformGroup>
+                    </Image.RenderTransform>
+                </Image>
             </Canvas>
         </Border>
         <Border Background="#FFCBCBCB" HorizontalAlignment="Right" Height="55" VerticalAlignment="Top" Margin="0 10 10 0">

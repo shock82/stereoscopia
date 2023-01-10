@@ -1,11 +1,8 @@
 ﻿using System;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 
 namespace Stereoscopia
 {
@@ -22,9 +19,10 @@ namespace Stereoscopia
 
         private bool _locked;
         private bool _isMouseCaptured = false;
+        private int angle;
 
         private ImageViewer _imageMaster;
-        private System.Drawing.Bitmap _bitmap;
+        //private System.Drawing.Bitmap _bitmap;
 
         #endregion
 
@@ -33,12 +31,7 @@ namespace Stereoscopia
         public ImageViewerSlave(string imagePath)
         {
             InitializeComponent();
-            //myimg.Source = new BitmapImage(new Uri(imagePath));
-
-            _bitmap = new System.Drawing.Bitmap(imagePath);
-            IntPtr hBitmap = _bitmap.GetHbitmap();
-            System.Windows.Media.ImageSource WpfBitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            myimg.Source = WpfBitmap;
+            myimg.Source = new BitmapImage(new Uri(imagePath));
 
             Locked = false;
             
@@ -134,6 +127,14 @@ namespace Stereoscopia
             }
         }
 
+        private void Window_MouseWheel_1(object sender, MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0)
+                ImageMaster.ZoomIn();
+            else
+                ImageMaster.ZoomOut();
+        }
+
         #endregion
 
         #region Public Methods
@@ -146,7 +147,6 @@ namespace Stereoscopia
                 myimg.SetValue(Canvas.TopProperty, canvasTop + Top);
                 canvasLeft = Canvas.GetLeft(myimg);
                 canvasTop = Canvas.GetTop(myimg);
-                //Console.WriteLine(string.Format("Auto -> Left: {0}, Top: {1}", canvasLeft, canvasTop));
             }
         }
 
@@ -157,68 +157,26 @@ namespace Stereoscopia
 
         public void ZoomIn()
         {
-            Point p = viewFinderSlave.TranslatePoint(new Point(0, 0), myimg);
-
-            Matrix m = myimg.RenderTransform.Value;
-            m.ScaleAtPrepend(1.1, 1.1, p.X, p.Y);
-            myimg.RenderTransform = new MatrixTransform(m);
-
-            /*ScaleTransform st = new ScaleTransform();
-            st.ScaleX += .2;
-            st.ScaleY += .2;
-            if (myimg.RenderTransform is TransformGroup)
-            {
-                ((TransformGroup)myimg.RenderTransform).Children.Add(st);
-            }
-            else
-            {
-                TransformGroup myTransformGroup = new TransformGroup();
-                myTransformGroup.Children.Add(st);
-                myimg.RenderTransform = myTransformGroup;
-            }*/
+            zoomView.ScaleX += .2;
+            zoomView.ScaleY += .2;
         }
 
         public void ZoomOut()
         {
-            Point p = viewFinderSlave.TranslatePoint(new Point(0, 0), myimg);
-
-            Matrix m = myimg.RenderTransform.Value;
-            m.ScaleAtPrepend(1 / 1.1, 1 / 1.1, p.X, p.Y);
-            myimg.RenderTransform = new MatrixTransform(m);
-
-            /*ScaleTransform st = new ScaleTransform();
-            st.ScaleX -= .2;
-            st.ScaleY -= .2;
-            if (myimg.RenderTransform is TransformGroup)
-            {
-                ((TransformGroup)myimg.RenderTransform).Children.Add(st);
-            }
-            else
-            {
-                TransformGroup myTransformGroup = new TransformGroup();
-                myTransformGroup.Children.Add(st);
-                myimg.RenderTransform = myTransformGroup;
-            }*/
+            zoomView.ScaleX -= .2;
+            zoomView.ScaleY -= .2;
         }
 
         public void Rotate()
         {
-            System.Drawing.Image image = System.Drawing.Image.FromHbitmap(_bitmap.GetHbitmap());
-            image.RotateFlip(System.Drawing.RotateFlipType.Rotate90FlipNone);
-
-            _bitmap = new System.Drawing.Bitmap(image);
-            IntPtr hBitmap = _bitmap.GetHbitmap();
-            System.Windows.Media.ImageSource WpfBitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            myimg.Source = WpfBitmap;
+            angle = angle + 90;
+            rotateView.Angle = angle;
         }
 
         public void Lock()
         {
             if (Locked)
             {
-                //btnUnLock.Visibility = Visibility.Collapsed;
-                //btnLock.Visibility = Visibility.Visible;
-
                 myimg.PreviewMouseDown += new MouseButtonEventHandler(myimg_MouseDown);
                 myimg.PreviewMouseMove += new MouseEventHandler(myimg_MouseMove);
                 myimg.PreviewMouseUp += new MouseButtonEventHandler(myimg_MouseUp);
@@ -227,9 +185,6 @@ namespace Stereoscopia
             }
             else
             {
-                //btnUnLock.Visibility = Visibility.Visible;
-                //btnLock.Visibility = Visibility.Collapsed;
-
                 myimg.PreviewMouseDown -= new MouseButtonEventHandler(myimg_MouseDown);
                 myimg.PreviewMouseMove -= new MouseEventHandler(myimg_MouseMove);
                 myimg.PreviewMouseUp -= new MouseButtonEventHandler(myimg_MouseUp);
@@ -241,24 +196,18 @@ namespace Stereoscopia
 
         public void FlipH()
         {
-            System.Drawing.Image image = System.Drawing.Image.FromHbitmap(_bitmap.GetHbitmap());
-            image.RotateFlip(System.Drawing.RotateFlipType.RotateNoneFlipX);
-
-            _bitmap = new System.Drawing.Bitmap(image);
-            IntPtr hBitmap = _bitmap.GetHbitmap();
-            System.Windows.Media.ImageSource WpfBitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            myimg.Source = WpfBitmap;
+            if (angle > 0 && ((angle / 90) % 2 != 0))
+                scaleV.ScaleY *= -1;
+            else
+                scaleH.ScaleX *= -1;
         }
 
         public void FlipV()
         {
-            System.Drawing.Image image = System.Drawing.Image.FromHbitmap(_bitmap.GetHbitmap());
-            image.RotateFlip(System.Drawing.RotateFlipType.RotateNoneFlipY);
-
-            _bitmap = new System.Drawing.Bitmap(image);
-            IntPtr hBitmap = _bitmap.GetHbitmap();
-            System.Windows.Media.ImageSource WpfBitmap = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            myimg.Source = WpfBitmap;
+            if (angle > 0 && ((angle / 90) % 2 != 0))
+                scaleH.ScaleX *= -1;
+            else
+                scaleV.ScaleY *= -1;
         }
 
         #endregion
@@ -303,12 +252,5 @@ namespace Stereoscopia
 
         #endregion
 
-        private void Window_MouseWheel_1(object sender, MouseWheelEventArgs e)
-        {
-            if (e.Delta > 0)
-                ImageMaster.ZoomIn();
-            else
-                ImageMaster.ZoomOut();
-        }
     }
 }

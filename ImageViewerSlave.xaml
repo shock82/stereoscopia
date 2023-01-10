@@ -8,27 +8,25 @@
     MouseRightButtonUp="Window_MouseRightButtonUp" KeyUp="Window_KeyUp" MouseWheel="Window_MouseWheel_1"
     Title="Image Viewer Slave">
     <Grid>
-        <!--<Canvas x:Name="mycanv">
-            <Image x:Name="myimg1" Stretch="UniformToFill"/>
-        </Canvas>-->        
         <Border>
-            <Canvas Name="mycanv">
-                <Image x:Name="myimg" Width="{Binding Path=ActualWidth, ElementName=mycanv}" Height="{Binding Path=ActualHeight, ElementName=mycanv}" Stretch="Uniform"/>
+            <Canvas Name="mycanv" RenderTransformOrigin=".5,.5">
+                <Canvas.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="zoomView" ScaleX="1" ScaleY="1" />
+                    </TransformGroup>
+                </Canvas.RenderTransform>
+                <Image x:Name="myimg" Width="{Binding Path=ActualWidth, ElementName=mycanv}" Height="{Binding Path=ActualHeight, ElementName=mycanv}" Stretch="Uniform"
+                       RenderTransformOrigin=".5,.5">
+                    <Image.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform x:Name="scaleH" ScaleX="1" />
+                            <ScaleTransform x:Name="scaleV" ScaleY="1" />
+                            <RotateTransform x:Name="rotateView" Angle="0" />
+                        </TransformGroup>
+                    </Image.RenderTransform>
+                </Image>
             </Canvas>
         </Border>
-        <!--<Border Background="#FFCBCBCB" HorizontalAlignment="Right" Height="55" VerticalAlignment="Top" Margin="0 10 10 0">
-            <StackPanel Orientation="Horizontal" Margin="10">
-                <Button Name="btnRotateDx" Click="btnRotate_Click" Height="32" Margin="0 0 10 0">
-                    <Image Source="Images\rotate_dx.png"></Image>
-                </Button>
-                <Button Name="btnLock" Click="btnLock_Click" Height="32" >
-                    <Image Source="Images\lock_open.png"></Image>
-                </Button>
-                <Button Name="btnUnLock" Click="btnLock_Click" Height="32" Visibility="Collapsed">
-                    <Image Source="Images\lock.png"></Image>
-                </Button>
-            </StackPanel>
-        </Border>-->
         <TextBlock x:Name="viewFinderSlave" Text="+" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red"/>
     </Grid>
 </Window>
