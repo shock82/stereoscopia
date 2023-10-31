@@ -96,6 +96,20 @@ namespace Stereoscopia
                 Point mouseCurrent = e.GetPosition(null);
                 double Left = mouseCurrent.X - mouseClick.X;
                 double Top = mouseCurrent.Y - mouseClick.Y;
+                if (zoomView.ScaleX < 10)
+                    Left = Left / 2;
+                else if (zoomView.ScaleX >= 10 && zoomView.ScaleX < 16)
+                    Left = Left / 4;
+                else if (zoomView.ScaleX >= 16 )
+                    Left = Left / 8;
+
+
+                if (zoomView.ScaleY < 10)
+                    Top = Top / 2;
+                else if (zoomView.ScaleY >= 10 && zoomView.ScaleY < 16)
+                    Top = Top / 4;
+                else if (zoomView.ScaleY >= 16 )
+                    Top = Top / 8;
                 mouseClick = e.GetPosition(null);
 
             if (Locked && _imageSlave != null && _imageSlave.Locked)
@@ -247,8 +261,14 @@ namespace Stereoscopia
         {
             if (Locked && _imageSlave.Locked)
             {
-                zoomView.ScaleX += .2;
-                zoomView.ScaleY += .2;
+                if (zoomView.ScaleX < 20)
+                    zoomView.ScaleX += .2;
+                else
+                    zoomView.ScaleX += .4;
+                if (zoomView.ScaleY < 20)
+                    zoomView.ScaleY += .2;
+                else
+                    zoomView.ScaleY += .4;
 
                 if (Locked && _imageSlave != null && _imageSlave.Locked)
                     Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
@@ -262,8 +282,14 @@ namespace Stereoscopia
         {
             if (Locked && _imageSlave.Locked)
             {
-                zoomView.ScaleX -= .2;
-                zoomView.ScaleY -= .2;
+                if (zoomView.ScaleX < 20)
+                    zoomView.ScaleX -= .2;
+                else
+                    zoomView.ScaleX -= .4;
+                if (zoomView.ScaleY < 20)
+                    zoomView.ScaleY -= .2;
+                else
+                    zoomView.ScaleY -= .4;
 
                 if (Locked && _imageSlave != null && _imageSlave.Locked)
                     Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>

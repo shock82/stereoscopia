@@ -157,14 +157,26 @@ namespace Stereoscopia
 
         public void ZoomIn()
         {
-            zoomView.ScaleX += .2;
-            zoomView.ScaleY += .2;
+            if (zoomView.ScaleX < 20)
+                zoomView.ScaleX += .2;
+            else
+                zoomView.ScaleX += .4;
+            if (zoomView.ScaleY < 20)
+                zoomView.ScaleY += .2;
+            else
+                zoomView.ScaleY += .4;
         }
 
         public void ZoomOut()
         {
-            zoomView.ScaleX -= .2;
-            zoomView.ScaleY -= .2;
+            if (zoomView.ScaleX < 20)
+                zoomView.ScaleX -= .2;
+            else
+                zoomView.ScaleX -= .4;
+            if (zoomView.ScaleY < 20)
+                zoomView.ScaleY -= .2;
+            else
+                zoomView.ScaleY -= .4;
         }
 
         public void Rotate()
