@@ -20,6 +20,7 @@ namespace Stereoscopia
         private bool _locked;
         private bool _isMouseCaptured = false;
         private int angle;
+        private bool _flip;
 
         private ImageViewer _imageMaster;
         //private System.Drawing.Bitmap _bitmap;
@@ -28,7 +29,7 @@ namespace Stereoscopia
 
         #region Constructor
 
-        public ImageViewerSlave(string imagePath)
+        public ImageViewerSlave(string imagePath, bool flip)
         {
             InitializeComponent();
             myimg.Source = new BitmapImage(new Uri(imagePath));
@@ -48,7 +49,9 @@ namespace Stereoscopia
                     img.SetValue(Canvas.LeftProperty, 0.0);
                     img.SetValue(Canvas.TopProperty, 0.0);
 
-                    FlipH();
+                    _flip = flip;
+                    if (_flip)
+                        FlipH();
                 }
                 catch
                 { }
@@ -143,7 +146,8 @@ namespace Stereoscopia
         {
             if (_isMouseCaptured)
             {
-                myimg.SetValue(Canvas.LeftProperty, canvasLeft + (Left*-1));
+                double leftMirror = Left * (_flip ? -1 : 1);
+                myimg.SetValue(Canvas.LeftProperty, canvasLeft + leftMirror);
                 myimg.SetValue(Canvas.TopProperty, canvasTop + Top);
                 canvasLeft = Canvas.GetLeft(myimg);
                 canvasTop = Canvas.GetTop(myimg);

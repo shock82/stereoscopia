@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:Stereoscopia"
     mc:Ignorable="d" WindowStartupLocation="CenterScreen"
-    Title="Stereoscopia" Height="450" Width="800">
+    Title="Stereoscopia" Height="550" Width="800">
     <Grid Margin="30">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="120"/>
@@ -14,6 +14,8 @@
             <ColumnDefinition Width="40"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="36"/>
+            <RowDefinition Height="36"/>
             <RowDefinition Height="36"/>
             <RowDefinition Height="36"/>
             <RowDefinition Height="36"/>
@@ -30,9 +32,20 @@
         <TextBox x:Name="txbImg2" IsReadOnly="True" Grid.Row="2" Grid.Column="1" Height="26"/>
         <Button x:Name="btnImg2" Content="..." Click="btnImg2_Click" Grid.Row="2" Grid.Column="2" Height="26"/>
 
-        <Button x:Name="start" Content="Avvia" Click="start_Click" Grid.Row="3" Grid.Column="1" Width="80" Height="26"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center">
+            <RadioButton Content="PLANAR" GroupName="machineType" IsChecked="{Binding MachineTypePlanar}" />
+            <RadioButton Content="PLURAVIEW" GroupName="machineType" IsChecked="{Binding MachineTypePluraview}" Margin="30 0"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center">
+            <Label Content="Display Master:" />
+            <ComboBox ItemsSource="{Binding AllDisplay}" SelectedItem="{Binding Display_1}" Width="120" DisplayMemberPath="DeviceName"/>
+            <Label Content="Display Slave:"  Margin="40 0 0 0"/>
+            <ComboBox ItemsSource="{Binding AllDisplay}" SelectedItem="{Binding Display_2}" Width="120" DisplayMemberPath="DeviceName"/>
+        </StackPanel>
 
-        <StackPanel Grid.Row="4" Orientation="Horizontal" Grid.ColumnSpan="3" VerticalAlignment="Bottom">
+        <Button x:Name="start" Content="Avvia" Click="start_Click" Grid.Row="5" Grid.Column="1" Width="80" Height="26"/>
+
+        <StackPanel Grid.Row="6" Orientation="Horizontal" Grid.ColumnSpan="3" VerticalAlignment="Bottom">
             <Image Source="Images/Logo_INGV.png" Grid.Row="4" VerticalAlignment="Bottom"/>
             <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Vertical" VerticalAlignment="Bottom" Margin="50 0 0 0">
                 <Label Content="Sviluppato da Sergio Falcone"/>
