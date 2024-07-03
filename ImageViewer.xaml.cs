@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 //using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Ribbon;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace Stereoscopia
@@ -21,6 +26,13 @@ namespace Stereoscopia
 
         private bool _locked;
         private int angle = 0;
+        private bool StateClosed = true;
+        private bool _isEditMode = false;
+        private string _imagePath;
+        private Ellipse elip = new Ellipse();
+        private Point anchorPoint;
+        private object _thick;
+        private int _thickness;
 
         private ImageViewerSlave _imageSlave;
 
@@ -52,6 +64,10 @@ namespace Stereoscopia
                 catch
                 { }
             }
+
+            ColorList = new List<string>() { "Red", "Green", "Blue", "Yellow", "Orange", "Violet", "Black" };
+            SelectedColor = "Red";
+
             this.DataContext = this;
         }
 
@@ -93,40 +109,75 @@ namespace Stereoscopia
         {
             if (((Image)sender).IsMouseCaptured)
             {
-                Point mouseCurrent = e.GetPosition(null);
-                double Left = mouseCurrent.X - mouseClick.X;
-                double Top = mouseCurrent.Y - mouseClick.Y;
-                if (zoomView.ScaleX < 10)
-                    Left = Left / 2;
-                else if (zoomView.ScaleX >= 10 && zoomView.ScaleX < 16)
-                    Left = Left / 4;
-                else if (zoomView.ScaleX >= 16 )
-                    Left = Left / 8;
+                if (!_isEditMode)
+                {
+                    Point mouseCurrent = e.GetPosition(null);
+                    double Left = mouseCurrent.X - mouseClick.X;
+                    double Top = mouseCurrent.Y - mouseClick.Y;
+                    if (zoomView.ScaleX < 10)
+                        Left = Left / 2;
+                    else if (zoomView.ScaleX >= 10 && zoomView.ScaleX < 16)
+                        Left = Left / 4;
+                    else if (zoomView.ScaleX >= 16)
+                        Left = Left / 8;
 
 
-                if (zoomView.ScaleY < 10)
-                    Top = Top / 2;
-                else if (zoomView.ScaleY >= 10 && zoomView.ScaleY < 16)
-                    Top = Top / 4;
-                else if (zoomView.ScaleY >= 16 )
-                    Top = Top / 8;
-                mouseClick = e.GetPosition(null);
+                    if (zoomView.ScaleY < 10)
+                        Top = Top / 2;
+                    else if (zoomView.ScaleY >= 10 && zoomView.ScaleY < 16)
+                        Top = Top / 4;
+                    else if (zoomView.ScaleY >= 16)
+                        Top = Top / 8;
+                    mouseClick = e.GetPosition(null);
 
-            if (Locked && _imageSlave != null && _imageSlave.Locked)
-                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => {
-                    _imageSlave.MouseMove(Left, Top);
-                }));
+                    if (Locked && _imageSlave != null && _imageSlave.Locked)
+                        Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                        {
+                            _imageSlave.MouseMove(Left, Top);
+                        }));
 
-                ((Image)sender).SetValue(Canvas.LeftProperty, canvasLeft + Left);
-                ((Image)sender).SetValue(Canvas.TopProperty, canvasTop + Top);
-                canvasLeft = Canvas.GetLeft(((Image)sender));
-                canvasTop = Canvas.GetTop(((Image)sender));
+                    ((Image)sender).SetValue(Canvas.LeftProperty, canvasLeft + Left);
+                    ((Image)sender).SetValue(Canvas.TopProperty, canvasTop + Top);
+                    canvasLeft = Canvas.GetLeft(((Image)sender));
+                    canvasTop = Canvas.GetTop(((Image)sender));
+                }
+                else
+                {
+                    Line line = new Line();
+                    var mycolor = ColorConverter.ConvertFromString(SelectedColor);
+                    line.Stroke = new SolidColorBrush((System.Windows.Media.Color)mycolor);
+                    line.X1 = mouseClick.X;
+                    line.Y1 = mouseClick.Y;
+                    Point tmp = e.MouseDevice.GetPosition(mycanv);
+                    line.X2 = tmp.X;// e.GetPosition(this).X;
+                    line.Y2 = tmp.Y;// e.GetPosition(this).Y;
+                    line.StrokeThickness = 1;// _thickness;
+                    mouseClick = e.GetPosition(this);
+                    mycanv.Children.Add(line);
+
+                    //Point location = e.MouseDevice.GetPosition(mycanv);
+
+                    //double minX = Math.Min(location.X, anchorPoint.X);
+                    //double minY = Math.Min(location.Y, anchorPoint.Y);
+                    //double maxX = Math.Max(location.X, anchorPoint.X);
+                    //double maxY = Math.Max(location.Y, anchorPoint.Y);
+
+                    //Canvas.SetTop(elip, minY);
+                    //Canvas.SetLeft(elip, minX);
+
+                    //double height = maxY - minY;
+                    //double width = maxX - minX;
+
+                    //elip.Height = Math.Abs(height);
+                    //elip.Width = Math.Abs(width);
+                }
             }
         }
 
         public void myimg_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            mouseClick = e.GetPosition(null);
+            //mouseClick = e.GetPosition(null);
+            mouseClick = e.MouseDevice.GetPosition(mycanv);
             canvasLeft = Canvas.GetLeft(((Image)sender));
             canvasTop = Canvas.GetTop(((Image)sender));
             ((Image)sender).CaptureMouse();
@@ -135,11 +186,39 @@ namespace Stereoscopia
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => {
                     _imageSlave.MouseDown();
                 }));
+
+            //anchorPoint = e.MouseDevice.GetPosition(mycanv);
+            //var mycolor = ColorConverter.ConvertFromString(SelectedColor);
+            ////line.Stroke = new SolidColorBrush((System.Windows.Media.Color)mycolor);
+            //elip = new Ellipse
+            //{
+            //    Stroke = new SolidColorBrush((System.Windows.Media.Color)mycolor),//Brushes.Black,
+            //    StrokeThickness = 2
+            //};
+            //mycanv.Children.Add(elip);
         }
 
         #endregion
 
         #region Events
+
+        private void ButtonMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if (StateClosed)
+            {
+                Storyboard sb = this.FindResource("OpenMenu") as Storyboard;
+                sb.Begin();
+                tick.Label = "Tickness";
+            }
+            else
+            {
+                Storyboard sb = this.FindResource("CloseMenu") as Storyboard;
+                sb.Begin();
+                tick.Label = "";
+            }
+
+            StateClosed = !StateClosed;
+        }
 
         private void btnLock_Click(object sender, RoutedEventArgs e)
         {
@@ -253,6 +332,95 @@ namespace Stereoscopia
             _imageSlave.FlipV();
         }
 
+        private void btnEdit_Click(object sender, RoutedEventArgs e)
+        {
+            _isEditMode = !_isEditMode;
+        }
+
+        private void btnSaveImage_Click(object sender, RoutedEventArgs e)
+        {
+            Rect bounds = VisualTreeHelper.GetDescendantBounds(mycanv);
+            double dpi = 96d;
+
+            RenderTargetBitmap rtb = new RenderTargetBitmap((int)bounds.Width, (int)bounds.Height, dpi, dpi, System.Windows.Media.PixelFormats.Default);
+
+            DrawingVisual dv = new DrawingVisual();
+            using (DrawingContext dc = dv.RenderOpen())
+            {
+                VisualBrush vb = new VisualBrush(mycanv);
+                dc.DrawRectangle(vb, null, new Rect(new Point(), bounds.Size));
+            }
+
+            rtb.Render(dv);
+
+            BitmapEncoder pngEncoder = new PngBitmapEncoder();
+            pngEncoder.Frames.Add(BitmapFrame.Create(rtb));
+
+            try
+            {
+                System.IO.MemoryStream ms = new System.IO.MemoryStream();
+
+                pngEncoder.Save(ms);
+                ms.Close();
+
+                System.IO.File.WriteAllBytes(_imagePath, ms.ToArray());
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void btnSaveAsImage_Click(object sender, RoutedEventArgs e)
+        {
+            Rect bounds = VisualTreeHelper.GetDescendantBounds(mycanv);
+            double dpi = 96d;
+
+            RenderTargetBitmap rtb = new RenderTargetBitmap((int)bounds.Width, (int)bounds.Height, dpi, dpi, System.Windows.Media.PixelFormats.Default);
+
+            DrawingVisual dv = new DrawingVisual();
+            using (DrawingContext dc = dv.RenderOpen())
+            {
+                VisualBrush vb = new VisualBrush(mycanv);
+                dc.DrawRectangle(vb, null, new Rect(new Point(), bounds.Size));
+            }
+
+            rtb.Render(dv);
+
+            BitmapEncoder pngEncoder = new PngBitmapEncoder();
+            pngEncoder.Frames.Add(BitmapFrame.Create(rtb));
+
+            try
+            {
+                System.IO.MemoryStream ms = new System.IO.MemoryStream();
+
+                pngEncoder.Save(ms);
+                ms.Close();
+
+
+
+                Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+                dlg.InitialDirectory = _imagePath.Substring(0, _imagePath.LastIndexOf("\\") + 1);
+                dlg.FileName = _imagePath.Substring(_imagePath.LastIndexOf("\\") + 1).Replace(_imagePath.Substring(_imagePath.LastIndexOf(".")), "") + "_" + DateTime.Now.Ticks; // Default file name
+                dlg.DefaultExt = _imagePath.Substring(_imagePath.LastIndexOf(".") + 1); // Default file extension
+                dlg.Filter = "Image Files (*.*)|*"; // Filter files by extension
+
+                // Show save file dialog box
+                Nullable<bool> result = dlg.ShowDialog();
+
+                // Process save file dialog box results
+                if (result == true)
+                {
+                    // Save document
+                    System.IO.File.WriteAllBytes(dlg.FileName, ms.ToArray());
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         #endregion
 
         #region Public Methods
@@ -337,7 +505,21 @@ namespace Stereoscopia
             }
         }
 
+        public List<string> ColorList { get; set; }
+        public string SelectedColor { get; set; }
 
+        public object SelectedThickness
+        {
+            get
+            {
+                return _thick;
+            }
+            set
+            {
+                _thick = value;
+                _thickness = Convert.ToInt32(((RibbonGalleryItem)_thick).Tag);
+            }
+        }
 
         #endregion
 

@@ -5,10 +5,397 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:Stereoscopia"
-    mc:Ignorable="d" MouseWheel="Window_MouseWheel"
+    mc:Ignorable="d" MouseWheel="Window_MouseWheel" WindowStyle="SingleBorderWindow"
     KeyUp="Window_KeyUp" MouseRightButtonUp="Window_MouseRightButtonUp"
     Title="Image Viewer Master" Height="450" Width="800">
+    <Window.Resources>
+        <Storyboard x:Key="OpenMenu">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)" Storyboard.TargetName="rectangle">
+                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="43.5"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)" Storyboard.TargetName="rectangle1">
+                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="-43.5"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="rectangle2">
+                <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="GridMenu">
+                <EasingDoubleKeyFrame KeyTime="0" Value="70"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="200"/>
+            </DoubleAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl1">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl2">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl3">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl4">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl5">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl6">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl7">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl8">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl9">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl10">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl11">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl12">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="rbnGll">
+                <EasingDoubleKeyFrame KeyTime="0" Value="60"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="194"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="CloseMenu">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)" Storyboard.TargetName="rectangle">
+                <EasingDoubleKeyFrame KeyTime="0" Value="43.5"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)" Storyboard.TargetName="rectangle1">
+                <EasingDoubleKeyFrame KeyTime="0" Value="-43.5"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="rectangle2">
+                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="1"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="GridMenu">
+                <EasingDoubleKeyFrame KeyTime="0" Value="200"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="70"/>
+            </DoubleAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl1">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Collapsed</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl2">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Collapsed</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl3">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Collapsed</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl4">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Collapsed</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl5">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Collapsed</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl6">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Collapsed</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl7">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Collapsed</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl8">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Collapsed</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl9">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Collapsed</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl10">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Collapsed</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl11">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Collapsed</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="lbl12">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Collapsed</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="rbnGll">
+                <EasingDoubleKeyFrame KeyTime="0" Value="194"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="65"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Style TargetType="{x:Type Button}" x:Key="btnStyle">
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Margin" Value="0 5" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="BorderBrush" Value="{x:Null}" />
+            <Setter Property="Background" Value="{x:Null}" />
+        </Style>
+    </Window.Resources>
     <Grid>
+        <Grid x:Name="GridMenu" HorizontalAlignment="Left" Width="70" Background="#FFCBCBCB" Panel.ZIndex="10001">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70"/>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <StackPanel>
+                <Grid Height="70" Background="#FFCBCBCB"/>
+            </StackPanel>
+            <Button x:Name="ButtonMenu" HorizontalAlignment="Right" VerticalAlignment="Top" Background="{x:Null}" BorderBrush="{x:Null}" Width="70" Height="70" Click="ButtonMenu_Click">
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Rectangle x:Name="rectangle" Width="30" Height="5" Margin="0 0 0 0" Fill="#FF515151" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0,0.5">
+                        <Rectangle.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Rectangle.RenderTransform>
+                    </Rectangle>
+                    <Rectangle x:Name="rectangle1" Width="30" Height="5" Margin="0 20 0 0 " Fill="#FF515151" HorizontalAlignment="Center" VerticalAlignment="Top" RenderTransformOrigin="-0,0.5">
+                        <Rectangle.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Rectangle.RenderTransform>
+                    </Rectangle>
+                    <Rectangle x:Name="rectangle2" Width="30" Height="5" Margin="0 10 0 0" Fill="#FF515151" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                </Grid>
+            </Button>
+            <StackPanel Orientation="Vertical" Grid.Row="1" Panel.ZIndex="10000" HorizontalAlignment="Center">
+                <!--#region Master -->
+                <Label Content="Master" FontWeight="Bold"/>
+                <Button x:Name="btnRotateDx" Click="btnRotate_Click" Style="{StaticResource btnStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Images\rotate_dx.png"/>
+                        <Label x:Name="lbl1" Content="Rotate" Foreground="White" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Button>
+                <Button Name="btnZoomOut" Click="btnZoomOut_Click" Visibility="Collapsed" Style="{StaticResource btnStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Images\zoom_out.png"/>
+                        <Label x:Name="lbl2" Content="Zoom out" Foreground="White" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Button>
+                <Button Name="btnZoomIn" Click="btnZoomIn_Click" Visibility="Collapsed" Style="{StaticResource btnStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Images\zoom_in.png"/>
+                        <Label x:Name="lbl3" Content="Zoom in" Foreground="White" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnFlipH" Click="btnFlipH_Click" Style="{StaticResource btnStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Images\flip_h.png"/>
+                        <Label x:Name="lbl4" Content="Flip" Foreground="White" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnFlipV" Click="btnFlipV_Click" Style="{StaticResource btnStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Images\flip_v.png"/>
+                        <Label x:Name="lbl5" Content="Mirror" Foreground="White" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnLock" Click="btnLock_Click" Style="{StaticResource btnStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Images\lock_open.png"/>
+                        <Label x:Name="lbl6" Content="Lock" Foreground="White" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnUnLock" Visibility="Collapsed" Click="btnLock_Click" Style="{StaticResource btnStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Images\lock.png"/>
+                        <Label x:Name="lbl7" Content="Unlock" Foreground="White" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Button>
+                <!--#endregion-->
+                <!--#region Slave -->
+                <Label Content="Slave" Margin="0 30 0 0" FontWeight="Bold"/>
+                <Button Name="btnRotateSlaveDx" Click="btnRotateSlave_Click" Style="{StaticResource btnStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Images\rotate_dx.png"/>
+                        <Label x:Name="lbl8" Content="Rotate" Foreground="White" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Button>
+                <Button Name="btnFlipSlaveH" Click="btnFlipHSlave_Click" Style="{StaticResource btnStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Images\flip_h.png"/>
+                        <Label x:Name="lbl9" Content="Flip" Foreground="White" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Button>
+                <Button Name="btnFlipSlaveV" Click="btnFlipVSlave_Click" Style="{StaticResource btnStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Images\flip_v.png"/>
+                        <Label x:Name="lbl10" Content="Mirror" Foreground="White" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnLockSlave" Click="btnLockSlave_Click" Style="{StaticResource btnStyle}" >
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Images\lock_open.png"/>
+                        <Label x:Name="lbl11" Content="Lock" Foreground="White" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnUnLockSlave" Click="btnLockSlave_Click" Visibility="Collapsed" Style="{StaticResource btnStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Images\lock.png"/>
+                        <Label x:Name="lbl12" Content="Unlock" Foreground="White" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Button>
+                <!--#endregion-->
+                <!--#region Editing -->
+                <Label Content="Editing" Margin="0 30 0 0" FontWeight="Bold"/>
+                <RibbonMenuButton Label="Colors" LargeImageSource="Images/tavolozza.png" >
+                    <RibbonGallery SelectedValue="Green" SelectedValuePath="Content" SelectedItem="{Binding SelectedColor}" >
+                        <RibbonGalleryCategory MinColumnCount="3" MaxColumnCount="3" ItemsSource="{Binding ColorList}">
+                            <RibbonGalleryCategory.ItemTemplate>
+                                <DataTemplate>
+                                    <Ellipse Width="20" Height="20" Fill="{Binding}" />
+                                </DataTemplate>
+                            </RibbonGalleryCategory.ItemTemplate>
+                        </RibbonGalleryCategory>
+                    </RibbonGallery>
+                </RibbonMenuButton>
+                <RibbonMenuButton x:Name="tick" Margin="0 10" UseLayoutRounding="False" LargeImageSource="Images\thickness.png" Foreground="White" FontSize="14" FontWeight="Medium">
+                    <RibbonGallery x:Name="rbnGll" SelectedItem="{Binding SelectedThickness}" ScrollViewer.VerticalScrollBarVisibility="Hidden" Width="60">
+                        <RibbonGalleryCategory MinColumnCount="1" MaxColumnCount="1">
+                            <RibbonGalleryItem Tag="1" IsSelected="True" Margin="0 4">
+                                <RibbonGalleryItem.ContentTemplate>
+                                    <DataTemplate>
+                                        <Image Source="Images\thickness_1.png" Tag="1" />
+                                    </DataTemplate>
+                                </RibbonGalleryItem.ContentTemplate>
+                            </RibbonGalleryItem>
+                            <RibbonGalleryItem Tag="2">
+                                <RibbonGalleryItem.ContentTemplate>
+                                    <DataTemplate>
+                                        <Image Source="Images\thickness_2.png" Tag="2"/>
+                                    </DataTemplate>
+                                </RibbonGalleryItem.ContentTemplate>
+                            </RibbonGalleryItem>
+                            <RibbonGalleryItem Tag="3" Margin="0 4">
+                                <RibbonGalleryItem.ContentTemplate>
+                                    <DataTemplate>
+                                        <Image Source="Images\thickness_3.png" Tag="3"/>
+                                    </DataTemplate>
+                                </RibbonGalleryItem.ContentTemplate>
+                            </RibbonGalleryItem>
+                            <RibbonGalleryItem Tag="4">
+                                <RibbonGalleryItem.ContentTemplate>
+                                    <DataTemplate>
+                                        <Image Source="Images\thickness_4.png" Tag="4"/>
+                                    </DataTemplate>
+                                </RibbonGalleryItem.ContentTemplate>
+                            </RibbonGalleryItem>
+                        </RibbonGalleryCategory>
+                    </RibbonGallery>
+                </RibbonMenuButton>
+                <RibbonToggleButton LargeImageSource="Images\matita.png" Click="btnEdit_Click" Label="Edit" />
+                <RibbonButton LargeImageSource="Images\salva.png" Click="btnSaveImage_Click" Label="Save" />
+                <RibbonButton LargeImageSource="Images\salva_come.png" Click="btnSaveAsImage_Click" Label="Save As" />
+                <!--#endregion-->
+            </StackPanel>
+
+        </Grid>
         <Border>
             <Canvas x:Name="mycanv" RenderTransformOrigin=".5,.5">
                 <Canvas.RenderTransform>
@@ -17,7 +404,7 @@
                     </TransformGroup>
                 </Canvas.RenderTransform>
                 <Image x:Name="myimg" Width="{Binding Path=ActualWidth, ElementName=mycanv}" Height="{Binding Path=ActualHeight, ElementName=mycanv}" Stretch="Uniform"
-                       RenderTransformOrigin=".5,.5">
+                       RenderTransformOrigin=".5,.5" >
                     <Image.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform x:Name="scaleH" ScaleX="1" />
@@ -28,7 +415,7 @@
                 </Image>
             </Canvas>
         </Border>
-        <Border Background="#FFCBCBCB" HorizontalAlignment="Right" Height="55" VerticalAlignment="Top" Margin="0 10 10 0">
+        <!--<Border Background="#FFCBCBCB" HorizontalAlignment="Right" Height="55" VerticalAlignment="Top" Margin="0 10 10 0">
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal" Margin="10">
                     <Button Name="btnRotateDx" Click="btnRotate_Click" Height="32">
@@ -75,12 +462,7 @@
                     </Button>
                 </StackPanel>
             </StackPanel>
-        </Border>
+        </Border>-->
         <TextBlock x:Name="viewfinder" Text="+" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red"/>
-        <!--<StackPanel Orientation="Horizontal" Margin="0 0 20 20" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <TextBlock Text="{Binding ScaleX, ElementName=zoomView}" Foreground="Blue"/>
-            <TextBlock Text=" : " Foreground="Blue"/>
-            <TextBlock Text="{Binding ScaleX, ElementName=zoomView}" Foreground="Blue"/>
-        </StackPanel>-->
     </Grid>
 </Window>
