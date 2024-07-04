@@ -32,7 +32,7 @@ namespace Stereoscopia
         private Ellipse elip = new Ellipse();
         private Point anchorPoint;
         private object _thick;
-        private int _thickness;
+        private int _thickness = 1;
 
         private ImageViewerSlave _imageSlave;
 
@@ -44,7 +44,7 @@ namespace Stereoscopia
         {
             InitializeComponent();
             myimg.Source = new BitmapImage(new Uri(imagePath));
-
+            _imagePath = imagePath;
             Locked = false;
             _imageSlave = slave;
 
@@ -105,6 +105,7 @@ namespace Stereoscopia
                 }));
         }
 
+        private Polyline NewPolyline = null;
         public void myimg_MouseMove(object sender, MouseEventArgs e)
         {
             if (((Image)sender).IsMouseCaptured)
@@ -143,17 +144,37 @@ namespace Stereoscopia
                 }
                 else
                 {
-                    Line line = new Line();
+                    // See if we are currently drawing.
+                    if (NewPolyline != null)
+                    {
+                        // Left button. Add a new point.
+                        NewPolyline.Points.Add(e.GetPosition(mycanv));
+                    }
+                    else
+                    {
+                        // We are not drawing. Start a new Polyline.
+                        NewPolyline = new Polyline();
+                        var mycolor = ColorConverter.ConvertFromString(SelectedColor);
+                        NewPolyline.Stroke = new SolidColorBrush((System.Windows.Media.Color)mycolor);
+                        NewPolyline.StrokeThickness = _thickness;
+                        NewPolyline.Points.Add(e.GetPosition(mycanv));
+                        NewPolyline.Points.Add(e.GetPosition(mycanv));
+                        mycanv.Children.Add(NewPolyline);
+                    }
+
+                    /*Line line = new Line();
                     var mycolor = ColorConverter.ConvertFromString(SelectedColor);
                     line.Stroke = new SolidColorBrush((System.Windows.Media.Color)mycolor);
                     line.X1 = mouseClick.X;
                     line.Y1 = mouseClick.Y;
                     Point tmp = e.MouseDevice.GetPosition(mycanv);
-                    line.X2 = tmp.X;// e.GetPosition(this).X;
-                    line.Y2 = tmp.Y;// e.GetPosition(this).Y;
+                    line.X2 = e.GetPosition(this).X;
+                    line.Y2 = e.GetPosition(this).Y;
                     line.StrokeThickness = 1;// _thickness;
                     mouseClick = e.GetPosition(this);
                     mycanv.Children.Add(line);
+                    Console.WriteLine(string.Format("X1: {0}, X2: {1}, X3: {6}, Y1: {2}, Y2: {3}, Y3: {7}, ScaleX: {4}, ScaleY: {5}", line.X1, line.X2, line.Y1, line.Y2, zoomView.ScaleX, zoomView.ScaleY, tmp.X, tmp.Y));
+                    */
 
                     //Point location = e.MouseDevice.GetPosition(mycanv);
 
@@ -178,6 +199,7 @@ namespace Stereoscopia
         {
             //mouseClick = e.GetPosition(null);
             mouseClick = e.MouseDevice.GetPosition(mycanv);
+            NewPolyline = null;
             canvasLeft = Canvas.GetLeft(((Image)sender));
             canvasTop = Canvas.GetTop(((Image)sender));
             ((Image)sender).CaptureMouse();
