@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:Stereoscopia"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d" MouseWheel="Window_MouseWheel" WindowStyle="SingleBorderWindow"
     KeyUp="Window_KeyUp" MouseRightButtonUp="Window_MouseRightButtonUp"
     Title="Image Viewer Master" Height="450" Width="800">
@@ -345,8 +346,8 @@
                 <!--#region Editing -->
                 <Label Content="Editing" Margin="0 30 0 0" FontWeight="Bold"/>
                 <RibbonMenuButton Label="Colors" LargeImageSource="Images/tavolozza.png" >
-                    <RibbonGallery SelectedValue="Green" SelectedValuePath="Content" SelectedItem="{Binding SelectedColor}" >
-                        <RibbonGalleryCategory MinColumnCount="3" MaxColumnCount="3" ItemsSource="{Binding ColorList}">
+                    <RibbonGallery SelectedValuePath="Content" SelectedItem="{Binding SelectedColor, Mode=TwoWay}" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                        <RibbonGalleryCategory MinColumnCount="3" MaxColumnCount="3" ItemsSource="{Binding ColorList}" >
                             <RibbonGalleryCategory.ItemTemplate>
                                 <DataTemplate>
                                     <Ellipse Width="20" Height="20" Fill="{Binding}" />
@@ -389,7 +390,21 @@
                         </RibbonGalleryCategory>
                     </RibbonGallery>
                 </RibbonMenuButton>
-                <RibbonToggleButton LargeImageSource="Images\matita.png" Click="btnEdit_Click" Label="Edit" />
+
+                <Menu>
+                    <MenuItem Icon="Images/tavolozza.png">
+                        <MenuItem.Header>
+                            <StackPanel>
+                                <Image Width="20" Height="20" Source="/Stereoscopia;component/Images/tavolozza.png" />
+                                <ContentPresenter Content="Reports" />
+                            </StackPanel>
+                        </MenuItem.Header>
+                        <MenuItem Header="MenuItem1" IsCheckable="True"/>
+                    </MenuItem>
+                </Menu>
+                <ToggleButton materialDesign:ToggleButtonAssist.OnContent="{materialDesign:PackIcon Kind=PencilOutline}"
+                              Content="{materialDesign:PackIcon Kind=PencilOffOutline}" Style="{StaticResource MaterialDesignActionToggleButton}"
+                              ToolTip="Draw" Click="btnEdit_Click" Margin="0 10"/>
                 <RibbonButton LargeImageSource="Images\salva.png" Click="btnSaveImage_Click" Label="Save" />
                 <RibbonButton LargeImageSource="Images\salva_come.png" Click="btnSaveAsImage_Click" Label="Save As" />
                 <!--#endregion-->

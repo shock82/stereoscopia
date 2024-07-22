@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -7,17 +6,19 @@ using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Threading;
 
 namespace Stereoscopia
 {
     /// <summary>
     /// Logica di interazione per MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         #region Fields
 
         private string _fileImage1 = "", _fileImage2 = "";
+        private List<ScreenIdView> _screenIdentifier;
 
         #endregion
 
@@ -33,6 +34,8 @@ namespace Stereoscopia
         }
 
         #endregion
+
+        #region Private Methods
 
         private void ReadInput()
         {
@@ -51,10 +54,10 @@ namespace Stereoscopia
                             switch (count)
                             {
                                 case 0:
-                                    Display_1 = AllDisplay.First(op => op.DeviceName.Equals(line));
+                                    Display_1 = AllDisplay.FirstOrDefault(op => op.DeviceName.Equals(line));
                                     break;
                                 case 1:
-                                    Display_2 = AllDisplay.First(op => op.DeviceName.Equals(line));
+                                    Display_2 = AllDisplay.FirstOrDefault(op => op.DeviceName.Equals(line));
                                     break;
                                 case 2:
                                     MachineTypePlanar = Convert.ToBoolean(line);
@@ -70,8 +73,8 @@ namespace Stereoscopia
             }
             else
             {
-                Display_1 = AllDisplay.FirstOrDefault(op => op.DeviceName.Contains("1"));
-                Display_2 = AllDisplay.FirstOrDefault(op => op.DeviceName.Contains("2"));
+                Display_1 = AllDisplay.FirstOrDefault(op => op.Primary);//.DeviceName.Contains("1"));
+                Display_2 = AllDisplay.FirstOrDefault(op => !op.DeviceName.Contains(Display_1.DeviceName));
             }
         }
 
@@ -108,6 +111,28 @@ namespace Stereoscopia
                 }
             }
         }
+
+        private void StartCloseTimer()
+        {
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(3d);
+            timer.Tick += TimerTick;
+            timer.Start();
+        }
+
+        private void TimerTick(object sender, EventArgs e)
+        {
+            DispatcherTimer timer = (DispatcherTimer)sender;
+            timer.Stop();
+            timer.Tick -= TimerTick;
+            foreach (var item in _screenIdentifier)
+            {
+                item.Close();
+            }
+            //this.myPopup.IsOpen = false;
+        }
+
+        #endregion
 
         #region Events
 
@@ -169,6 +194,24 @@ namespace Stereoscopia
 
             ivSlave.Owner = ivMaster;
             WriteInput();
+        }
+
+        private void btnIdentifica_Click(object sender, RoutedEventArgs e)
+        {
+            _screenIdentifier = new List<ScreenIdView>();
+            foreach (var screen in Screen.AllScreens)
+            {
+                Rectangle r1 = screen.WorkingArea;
+                ScreenIdView window = new ScreenIdView(screen.DeviceName.Replace(@"\\.\", ""));
+
+                window.Top = r1.Top;
+                window.Left = r1.Left;
+                window.Width = r1.Width;
+                window.Height = r1.Height;
+                window.Show();
+                _screenIdentifier.Add(window);
+            }
+            StartCloseTimer();
         }
 
         #endregion

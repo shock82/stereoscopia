@@ -6,7 +6,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:Stereoscopia"
     mc:Ignorable="d" WindowStartupLocation="CenterScreen"
+    Style="{StaticResource MaterialDesignWindow}"
     Title="Stereoscopia" Height="550" Width="800">
+    <Window.Resources>
+        <local:DisplayNameConverter x:Key="displayNameConv"/>
+    </Window.Resources>
     <Grid Margin="30">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="120"/>
@@ -36,14 +40,27 @@
             <RadioButton Content="PLANAR" GroupName="machineType" IsChecked="{Binding MachineTypePlanar}" />
             <RadioButton Content="PLURAVIEW" GroupName="machineType" IsChecked="{Binding MachineTypePluraview}" Margin="30 0"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center">
             <Label Content="Display Master:" />
-            <ComboBox ItemsSource="{Binding AllDisplay}" SelectedItem="{Binding Display_1}" Width="120" DisplayMemberPath="DeviceName"/>
+            <ComboBox ItemsSource="{Binding AllDisplay}" SelectedItem="{Binding Display_1}" Width="120" VerticalAlignment="Top" >
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource displayNameConv}}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
             <Label Content="Display Slave:"  Margin="40 0 0 0"/>
-            <ComboBox ItemsSource="{Binding AllDisplay}" SelectedItem="{Binding Display_2}" Width="120" DisplayMemberPath="DeviceName"/>
+            <ComboBox ItemsSource="{Binding AllDisplay}" SelectedItem="{Binding Display_2}" Width="120" VerticalAlignment="Top">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource displayNameConv}}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button x:Name="btnIdentifica" Content="Identifica" Click="btnIdentifica_Click" Margin="20 0 0 0"/>
         </StackPanel>
 
-        <Button x:Name="start" Content="Avvia" Click="start_Click" Grid.Row="5" Grid.Column="1" Width="80" Height="26"/>
+        <Button x:Name="start" Content="Start" Click="start_Click" Grid.Row="5" Grid.Column="1" Width="80" Height="36"/>
 
         <StackPanel Grid.Row="6" Orientation="Horizontal" Grid.ColumnSpan="3" VerticalAlignment="Bottom">
             <Image Source="Images/Logo_INGV.png" Grid.Row="4" VerticalAlignment="Bottom"/>
