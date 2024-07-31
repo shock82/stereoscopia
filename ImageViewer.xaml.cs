@@ -106,6 +106,7 @@ namespace Stereoscopia
         }
 
         private Polyline NewPolyline = null;
+        private bool first = true;
         public void myimg_MouseMove(object sender, MouseEventArgs e)
         {
             if (((Image)sender).IsMouseCaptured)
@@ -137,6 +138,20 @@ namespace Stereoscopia
                             _imageSlave.MouseMove(Left, Top);
                         }));
 
+                    //foreach (var item in mycanv.Children)
+                    //{
+                    //    if (typeof(Polyline) == item.GetType() && !first)
+                    //    {
+                    //        ((Polyline)item).SetValue(Canvas.LeftProperty, canvasLeft + Left);
+                    //        ((Polyline)item).SetValue(Canvas.TopProperty, canvasTop + Top);
+                    //    }
+                    //    else if (typeof(Image) == item.GetType())
+                    //    {
+                    //        ((Image)item).SetValue(Canvas.LeftProperty, canvasLeft + Left);
+                    //        ((Image)item).SetValue(Canvas.TopProperty, canvasTop + Top);
+                    //    }
+                    //}
+                    //first = false;
                     ((Image)sender).SetValue(Canvas.LeftProperty, canvasLeft + Left);
                     ((Image)sender).SetValue(Canvas.TopProperty, canvasTop + Top);
                     canvasLeft = Canvas.GetLeft(((Image)sender));
@@ -161,6 +176,7 @@ namespace Stereoscopia
                         NewPolyline.Points.Add(e.GetPosition(mycanv));
                         mycanv.Children.Add(NewPolyline);
                     }
+                    first = true;
 
                     /*Line line = new Line();
                     var mycolor = ColorConverter.ConvertFromString(SelectedColor);

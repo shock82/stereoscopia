@@ -8,7 +8,11 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d" MouseWheel="Window_MouseWheel" WindowStyle="SingleBorderWindow"
     KeyUp="Window_KeyUp" MouseRightButtonUp="Window_MouseRightButtonUp"
-    Title="Image Viewer Master" Height="450" Width="800">
+    xmlns:classic="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Classic"
+    xmlns:primitives="clr-namespace:System.Windows.Controls.Ribbon.Primitives;assembly=System.Windows.Controls.Ribbon"
+    Title="Image Viewer Master"  Width="800"
+    
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
     <Window.Resources>
         <Storyboard x:Key="OpenMenu">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)" Storyboard.TargetName="rectangle">
@@ -229,6 +233,19 @@
             <Setter Property="BorderBrush" Value="{x:Null}" />
             <Setter Property="Background" Value="{x:Null}" />
         </Style>
+
+        <ControlTemplate x:Key="RibbonTemplate" TargetType="{x:Type Ribbon}">
+            <Grid SnapsToDevicePixels="true" Background="{x:Null}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="0"/>
+                </Grid.RowDefinitions>
+                <ContentControl Background="{x:Null}" x:Name="mainItemsPresenterHost" Focusable="false" Grid.Row="1">
+                    <ItemsPresenter x:Name="ItemsPresenter"/>
+                </ContentControl>
+                <RibbonTabHeaderItemsControl Background="{x:Null}" x:Name="TabHeaderItemsControl" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            </Grid>
+        </ControlTemplate>
     </Window.Resources>
     <Grid>
         <Grid x:Name="GridMenu" HorizontalAlignment="Left" Width="70" Background="#FFCBCBCB" Panel.ZIndex="10001">
@@ -345,63 +362,55 @@
                 <!--#endregion-->
                 <!--#region Editing -->
                 <Label Content="Editing" Margin="0 30 0 0" FontWeight="Bold"/>
-                <RibbonMenuButton Label="Colors" LargeImageSource="Images/tavolozza.png" >
-                    <RibbonGallery SelectedValuePath="Content" SelectedItem="{Binding SelectedColor, Mode=TwoWay}" ScrollViewer.VerticalScrollBarVisibility="Hidden">
-                        <RibbonGalleryCategory MinColumnCount="3" MaxColumnCount="3" ItemsSource="{Binding ColorList}" >
-                            <RibbonGalleryCategory.ItemTemplate>
-                                <DataTemplate>
-                                    <Ellipse Width="20" Height="20" Fill="{Binding}" />
-                                </DataTemplate>
-                            </RibbonGalleryCategory.ItemTemplate>
-                        </RibbonGalleryCategory>
-                    </RibbonGallery>
-                </RibbonMenuButton>
-                <RibbonMenuButton x:Name="tick" Margin="0 10" UseLayoutRounding="False" LargeImageSource="Images\thickness.png" Foreground="White" FontSize="14" FontWeight="Medium">
-                    <RibbonGallery x:Name="rbnGll" SelectedItem="{Binding SelectedThickness}" ScrollViewer.VerticalScrollBarVisibility="Hidden" Width="60">
-                        <RibbonGalleryCategory MinColumnCount="1" MaxColumnCount="1">
-                            <RibbonGalleryItem Tag="1" IsSelected="True" Margin="0 4">
-                                <RibbonGalleryItem.ContentTemplate>
+                <Ribbon Template="{StaticResource RibbonTemplate}" BorderBrush="Transparent" Width="65">
+                    <RibbonMenuButton Label="Colors" LargeImageSource="Images/tavolozza.png" Background="#FFCBCBCB" Width="66" Margin="-7 -4 -7 -2">
+                        <RibbonGallery SelectedValuePath="Content" SelectedItem="{Binding SelectedColor, Mode=TwoWay}" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                            <RibbonGalleryCategory MinColumnCount="3" MaxColumnCount="3" ItemsSource="{Binding ColorList}" >
+                                <RibbonGalleryCategory.ItemTemplate>
                                     <DataTemplate>
-                                        <Image Source="Images\thickness_1.png" Tag="1" />
+                                        <Ellipse Width="20" Height="20" Fill="{Binding}" />
                                     </DataTemplate>
-                                </RibbonGalleryItem.ContentTemplate>
-                            </RibbonGalleryItem>
-                            <RibbonGalleryItem Tag="2">
-                                <RibbonGalleryItem.ContentTemplate>
-                                    <DataTemplate>
-                                        <Image Source="Images\thickness_2.png" Tag="2"/>
-                                    </DataTemplate>
-                                </RibbonGalleryItem.ContentTemplate>
-                            </RibbonGalleryItem>
-                            <RibbonGalleryItem Tag="3" Margin="0 4">
-                                <RibbonGalleryItem.ContentTemplate>
-                                    <DataTemplate>
-                                        <Image Source="Images\thickness_3.png" Tag="3"/>
-                                    </DataTemplate>
-                                </RibbonGalleryItem.ContentTemplate>
-                            </RibbonGalleryItem>
-                            <RibbonGalleryItem Tag="4">
-                                <RibbonGalleryItem.ContentTemplate>
-                                    <DataTemplate>
-                                        <Image Source="Images\thickness_4.png" Tag="4"/>
-                                    </DataTemplate>
-                                </RibbonGalleryItem.ContentTemplate>
-                            </RibbonGalleryItem>
-                        </RibbonGalleryCategory>
-                    </RibbonGallery>
-                </RibbonMenuButton>
-
-                <Menu>
-                    <MenuItem Icon="Images/tavolozza.png">
-                        <MenuItem.Header>
-                            <StackPanel>
-                                <Image Width="20" Height="20" Source="/Stereoscopia;component/Images/tavolozza.png" />
-                                <ContentPresenter Content="Reports" />
-                            </StackPanel>
-                        </MenuItem.Header>
-                        <MenuItem Header="MenuItem1" IsCheckable="True"/>
-                    </MenuItem>
-                </Menu>
+                                </RibbonGalleryCategory.ItemTemplate>
+                            </RibbonGalleryCategory>
+                        </RibbonGallery>
+                    </RibbonMenuButton>
+                </Ribbon>
+                <Ribbon Template="{StaticResource RibbonTemplate}" BorderBrush="Transparent" Width="65">
+                    <RibbonMenuButton x:Name="tick" Label="Tickness" LargeImageSource="Images\thickness.png"  Background="#FFCBCBCB" Width="66" Margin="-7 -4 -7 -2">
+                        <RibbonGallery x:Name="rbnGll" SelectedItem="{Binding SelectedThickness}" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                            <RibbonGalleryCategory MinColumnCount="1" MaxColumnCount="1">
+                                <RibbonGalleryItem Tag="1" IsSelected="True" Margin="0 4">
+                                    <RibbonGalleryItem.ContentTemplate>
+                                        <DataTemplate>
+                                            <Image Source="Images\thickness_1.png" Tag="1" />
+                                        </DataTemplate>
+                                    </RibbonGalleryItem.ContentTemplate>
+                                </RibbonGalleryItem>
+                                <RibbonGalleryItem Tag="2">
+                                    <RibbonGalleryItem.ContentTemplate>
+                                        <DataTemplate>
+                                            <Image Source="Images\thickness_2.png" Tag="2"/>
+                                        </DataTemplate>
+                                    </RibbonGalleryItem.ContentTemplate>
+                                </RibbonGalleryItem>
+                                <RibbonGalleryItem Tag="3" Margin="0 4">
+                                    <RibbonGalleryItem.ContentTemplate>
+                                        <DataTemplate>
+                                            <Image Source="Images\thickness_3.png" Tag="3"/>
+                                        </DataTemplate>
+                                    </RibbonGalleryItem.ContentTemplate>
+                                </RibbonGalleryItem>
+                                <RibbonGalleryItem Tag="4">
+                                    <RibbonGalleryItem.ContentTemplate>
+                                        <DataTemplate>
+                                            <Image Source="Images\thickness_4.png" Tag="4"/>
+                                        </DataTemplate>
+                                    </RibbonGalleryItem.ContentTemplate>
+                                </RibbonGalleryItem>
+                            </RibbonGalleryCategory>
+                        </RibbonGallery>
+                    </RibbonMenuButton>
+                </Ribbon>
                 <ToggleButton materialDesign:ToggleButtonAssist.OnContent="{materialDesign:PackIcon Kind=PencilOutline}"
                               Content="{materialDesign:PackIcon Kind=PencilOffOutline}" Style="{StaticResource MaterialDesignActionToggleButton}"
                               ToolTip="Draw" Click="btnEdit_Click" Margin="0 10"/>
@@ -430,54 +439,6 @@
                 </Image>
             </Canvas>
         </Border>
-        <!--<Border Background="#FFCBCBCB" HorizontalAlignment="Right" Height="55" VerticalAlignment="Top" Margin="0 10 10 0">
-            <StackPanel Orientation="Vertical">
-                <StackPanel Orientation="Horizontal" Margin="10">
-                    <Button Name="btnRotateDx" Click="btnRotate_Click" Height="32">
-                        <Image Source="Images\rotate_dx.png"></Image>
-                    </Button>
-                    <Button Name="btnZoomOut" Click="btnZoomOut_Click" Height="32" Margin="10 0" Visibility="Collapsed">
-                        <Image Source="Images\zoom_out.png"></Image>
-                    </Button>
-                    <Button Name="btnZoomIn" Click="btnZoomIn_Click" Height="32" Visibility="Collapsed">
-                        <Image Source="Images\zoom_in.png"></Image>
-                    </Button>
-                    <Button Name="btnFlipH" Click="btnFlipH_Click" Height="32" Margin="10 0">
-                        <Image Source="Images\flip_h.png"></Image>
-                    </Button>
-                    <Button Name="btnFlipV" Click="btnFlipV_Click" Height="32" Margin="0 0 10 0">
-                        <Image Source="Images\flip_v.png"></Image>
-                    </Button>
-                    <Button Name="btnLock" Click="btnLock_Click" Height="32" >
-                        <Image Source="Images\lock_open.png"></Image>
-                    </Button>
-                    <Button Name="btnUnLock" Click="btnLock_Click" Height="32" Visibility="Collapsed">
-                        <Image Source="Images\lock.png"></Image>
-                    </Button>
-                </StackPanel>
-            </StackPanel>
-        </Border>
-        <Border Background="#FFCBCBCB" HorizontalAlignment="Right" Height="55" VerticalAlignment="Top" Margin="0 70 10 0">
-            <StackPanel Orientation="Vertical">
-                <StackPanel Orientation="Horizontal" Margin="10">
-                    <Button Name="btnRotateSlaveDx" Click="btnRotateSlave_Click" Height="32">
-                        <Image Source="Images\rotate_dx.png"></Image>
-                    </Button>                    
-                    <Button Name="btnFlipSlaveH" Click="btnFlipHSlave_Click" Height="32" Margin="10 0">
-                        <Image Source="Images\flip_h.png"></Image>
-                    </Button>
-                    <Button Name="btnFlipSlaveV" Click="btnFlipVSlave_Click" Height="32" Margin="0 0 10 0">
-                        <Image Source="Images\flip_v.png"></Image>
-                    </Button>
-                    <Button Name="btnLockSlave" Click="btnLockSlave_Click" Height="32" >
-                        <Image Source="Images\lock_open.png"></Image>
-                    </Button>
-                    <Button Name="btnUnLockSlave" Click="btnLockSlave_Click" Height="32" Visibility="Collapsed">
-                        <Image Source="Images\lock.png"></Image>
-                    </Button>
-                </StackPanel>
-            </StackPanel>
-        </Border>-->
         <TextBlock x:Name="viewfinder" Text="+" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red"/>
     </Grid>
 </Window>
