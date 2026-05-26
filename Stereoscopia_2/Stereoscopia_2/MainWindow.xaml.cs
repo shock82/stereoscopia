@@ -57,6 +57,8 @@ namespace Stereoscopia_2
             left.WindowState = WindowState.Maximized;
             right.WindowState = WindowState.Maximized;
 
+            left.InitDrawingTools();
+
             this.Hide();
         }
 

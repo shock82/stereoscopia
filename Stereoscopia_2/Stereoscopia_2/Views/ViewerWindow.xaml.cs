@@ -34,6 +34,12 @@ namespace Stereoscopia_2.Views
         private double _srcW, _srcH;
         private bool _ready = false;
 
+        private bool _drawMode = false;
+        private bool _isDrawing = false;
+        private System.Windows.Point _drawStart;           // punto iniziale in coordinate CANVAS (pre-transform)
+        private Shape _currentShape;        // forma in costruzione
+        private readonly List<Shape> _shapes = new();
+
         public ViewerWindow(string imagePath, string label, bool isFlippedMonitor)
         {
             InitializeComponent();
@@ -89,7 +95,11 @@ namespace Stereoscopia_2.Views
 
         // ── APPLICA MATRICE ───────────────────────────────────────────────────
 
-        private void Apply() => ImgMatrix.Matrix = _localMatrix;
+        private void Apply()
+        {
+            ImgMatrix.Matrix = _localMatrix;
+            DrawMatrix.Matrix = _localMatrix;   // ← aggiunta
+        }
 
         // ── OPERAZIONI SULLA MATRICE ──────────────────────────────────────────
 
@@ -285,6 +295,12 @@ namespace Stereoscopia_2.Views
 
         private void ImageContainer_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (_drawMode)
+            {
+                StartDraw(e.GetPosition(DrawingCanvas));
+                e.Handled = true;
+                return;
+            }
             _panStart = e.GetPosition(ImageContainer);
             _isPanning = true;
             ImageContainer.CaptureMouse();
@@ -292,12 +308,24 @@ namespace Stereoscopia_2.Views
 
         private void ImageContainer_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            if (_drawMode && _isDrawing)
+            {
+                FinishDraw();
+                e.Handled = true;
+                return;
+            }
             _isPanning = false;
             ImageContainer.ReleaseMouseCapture();
         }
 
         private void ImageContainer_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
+            if (_drawMode && _isDrawing)
+            {
+                UpdateDraw(e.GetPosition(DrawingCanvas));
+                e.Handled = true;
+                return;
+            }
             if (!_isPanning) return;
             var pos = e.GetPosition(ImageContainer);
             _localMatrix.Translate(pos.X - _panStart.X, pos.Y - _panStart.Y);
@@ -342,5 +370,248 @@ namespace Stereoscopia_2.Views
         {
             System.Windows.Application.Current.Shutdown();
         }
+
+        // ── COMANDI TOOLBAR DISEGNO ───────────────────────────────────────────────────
+        // Colori disponibili
+        private static readonly string[] PaletteHex =
+        {
+            "#FF0000", "#FF6600", "#FFFF00", "#00FF00",
+            "#00BFFF", "#FFFFFF", "#000000", "#FF69B4"
+        };
+
+        public void InitDrawingTools()
+        {
+            // Popola la palette colori
+            foreach (var hex in PaletteHex)
+            {
+                var item = new ListBoxItem
+                {
+                    Tag = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex)),
+                    Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex))
+                };
+                ColorPicker.Items.Add(item);
+            }
+            ColorPicker.SelectedIndex = 0;
+
+            DrawToolbar.Visibility = Visibility.Visible;
+
+            // Sincronizza DrawMatrix con ImgMatrix
+            DrawMatrix.Matrix = ImgMatrix.Matrix;
+        }
+
+        private void DrawMode_Checked(object sender, RoutedEventArgs e)
+        {
+            _drawMode = true;
+            DrawingCanvas.IsHitTestVisible = true;
+            ImageContainer.Cursor = System.Windows.Input.Cursors.Cross;
+        }
+
+        private void DrawMode_Unchecked(object sender, RoutedEventArgs e)
+        {
+            _drawMode = false;
+            DrawingCanvas.IsHitTestVisible = false;
+            ImageContainer.Cursor = System.Windows.Input.Cursors.Arrow;
+            _isDrawing = false;
+            if (_currentShape != null)
+            {
+                DrawingCanvas.Children.Remove(_currentShape);
+                _currentShape = null;
+            }
+        }
+
+        private System.Windows.Media.Brush SelectedBrush =>
+            (ColorPicker.SelectedItem as ListBoxItem)?.Tag as System.Windows.Media.Brush
+            ?? System.Windows.Media.Brushes.Red;
+
+        private double SelectedThickness => ThicknessSlider.Value;
+
+        private void StartDraw(System.Windows.Point p)
+        {
+            _drawStart = p;
+            _isDrawing = true;
+
+            if (RbLine.IsChecked == true)
+            {
+                _currentShape = new Line
+                {
+                    X1 = p.X,
+                    Y1 = p.Y,
+                    X2 = p.X,
+                    Y2 = p.Y,
+                    Stroke = SelectedBrush,
+                    StrokeThickness = SelectedThickness,
+                    StrokeStartLineCap = PenLineCap.Round,
+                    StrokeEndLineCap = PenLineCap.Round
+                    //StrokeLineCap = PenLineCap.Round
+                };
+            }
+            else
+            {
+                _currentShape = new Ellipse
+                {
+                    Width = 0,
+                    Height = 0,
+                    Stroke = SelectedBrush,
+                    StrokeThickness = SelectedThickness,
+                    Fill = System.Windows.Media.Brushes.Transparent
+                };
+                Canvas.SetLeft(_currentShape, p.X);
+                Canvas.SetTop(_currentShape, p.Y);
+            }
+
+            DrawingCanvas.Children.Add(_currentShape);
+            ImageContainer.CaptureMouse();
+        }
+
+        private void UpdateDraw(System.Windows.Point p)
+        {
+            if (_currentShape is Line line)
+            {
+                line.X2 = p.X;
+                line.Y2 = p.Y;
+            }
+            else if (_currentShape is Ellipse ellipse)
+            {
+                double x = Math.Min(p.X, _drawStart.X);
+                double y = Math.Min(p.Y, _drawStart.Y);
+                double w = Math.Abs(p.X - _drawStart.X);
+                double h = Math.Abs(p.Y - _drawStart.Y);
+                // Shift = cerchio perfetto
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                {
+                    double side = Math.Min(w, h);
+                    w = h = side;
+                }
+                ellipse.Width = w;
+                ellipse.Height = h;
+                Canvas.SetLeft(ellipse, x);
+                Canvas.SetTop(ellipse, y);
+            }
+        }
+
+        private void FinishDraw()
+        {
+            if (_currentShape != null)
+                _shapes.Add(_currentShape);
+            _currentShape = null;
+            _isDrawing = false;
+            ImageContainer.ReleaseMouseCapture();
+        }
+
+        private void DrawCmd_Click(object sender, RoutedEventArgs e)
+        {
+            string tag = (sender as System.Windows.Controls.Button)?.Tag?.ToString() ?? "";
+            switch (tag)
+            {
+                case "undo":
+                    if (_shapes.Count > 0)
+                    {
+                        DrawingCanvas.Children.Remove(_shapes[^1]);
+                        _shapes.RemoveAt(_shapes.Count - 1);
+                    }
+                    break;
+
+                case "clear":
+                    DrawingCanvas.Children.Clear();
+                    _shapes.Clear();
+                    break;
+
+                case "save":
+                    SaveImageWithDrawings();
+                    break;
+            }
+        }
+
+        // ── SALVATAGGIO ───────────────────────────────────────────────────────────
+
+        private void SaveImageWithDrawings()
+        {
+            var dlg = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "PNG|*.png|JPEG|*.jpg|TIFF|*.tif",
+                DefaultExt = ".png",
+                FileName = "stereoscopia_export"
+            };
+            if (dlg.ShowDialog() != true) return;
+
+            var src = (System.Windows.Media.Imaging.BitmapSource)MainImage.Source;
+            int outW = src.PixelWidth;
+            int outH = src.PixelHeight;
+
+            // Crea DrawingVisual alla risoluzione nativa dell'immagine
+            var dv = new DrawingVisual();
+            using (var dc = dv.RenderOpen())
+            {
+                // Disegna l'immagine sorgente
+                dc.DrawImage(src, new Rect(0, 0, outW, outH));
+
+                // La matrice corrente trasforma coordinate immagine → viewport.
+                // Vogliamo il contrario: viewport → immagine (= matrice inversa).
+                // Le forme nel DrawingCanvas sono già in coordinate viewport (post-transform),
+                // quindi dobbiamo applicare la matrice inversa per riportarle in coordinate immagine.
+                var imgToViewport = ImgMatrix.Matrix;
+                imgToViewport.Invert(); // ora è viewport → immagine ... NO: invertiamo nel senso giusto
+
+                // Matrice che porta da coordinate DrawingCanvas a coordinate immagine nativa
+                var m = ImgMatrix.Matrix;
+                m.Invert(); // viewport → spazio immagine (pixel fisici * scale_iniziale)
+
+                dc.PushTransform(new MatrixTransform(m));
+
+                foreach (var shape in _shapes)
+                {
+                    if (shape is Line line)
+                    {
+                        var pen = new System.Windows.Media.Pen(line.Stroke, line.StrokeThickness)
+                        {
+                            StartLineCap = PenLineCap.Round,
+                            EndLineCap = PenLineCap.Round
+                        };
+                        dc.DrawLine(pen,
+                            new System.Windows.Point(line.X1, line.Y1),
+                            new System.Windows.Point(line.X2, line.Y2));
+                    }
+                    else if (shape is Ellipse ellipse)
+                    {
+                        double l = Canvas.GetLeft(ellipse);
+                        double t = Canvas.GetTop(ellipse);
+                        double rx = ellipse.Width / 2;
+                        double ry = ellipse.Height / 2;
+                        var pen = new System.Windows.Media.Pen(ellipse.Stroke, ellipse.StrokeThickness);
+                        dc.DrawEllipse(System.Windows.Media.Brushes.Transparent, pen,
+                            new System.Windows.Point(l + rx, t + ry), rx, ry);
+                    }
+                }
+
+                dc.Pop();
+            }
+
+            // Render a bitmap
+            var rtb = new System.Windows.Media.Imaging.RenderTargetBitmap(
+                outW, outH, src.DpiX, src.DpiY,
+                PixelFormats.Pbgra32);
+            rtb.Render(dv);
+
+            // Codifica e salva
+            System.Windows.Media.Imaging.BitmapEncoder encoder = dlg.FilterIndex switch
+            {
+                2 => new System.Windows.Media.Imaging.JpegBitmapEncoder
+                { Frames = { System.Windows.Media.Imaging.BitmapFrame.Create(rtb) } },
+                3 => new System.Windows.Media.Imaging.TiffBitmapEncoder
+                { Frames = { System.Windows.Media.Imaging.BitmapFrame.Create(rtb) } },
+                _ => new System.Windows.Media.Imaging.PngBitmapEncoder
+                { Frames = { System.Windows.Media.Imaging.BitmapFrame.Create(rtb) } }
+            };
+
+            using var fs = System.IO.File.Create(dlg.FileName);
+            encoder.Save(fs);
+
+            System.Windows.MessageBox.Show(
+                $"Immagine salvata:\n{dlg.FileName}",
+                "Salvataggio completato",
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Information);
+        }
+
     }
 }
