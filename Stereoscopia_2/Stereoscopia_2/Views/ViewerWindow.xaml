@@ -1,0 +1,73 @@
+﻿<Window x:Class="Stereoscopia_2.Views.ViewerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Viewer" Background="#0D0D0D"
+        WindowStyle="None" AllowsTransparency="False">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Area immagine -->
+        <Grid Grid.Row="0"
+              x:Name="ImageContainer"
+              Background="#0D0D0D"
+              ClipToBounds="True"
+              SizeChanged="ImageContainer_SizeChanged"
+              MouseWheel="ImageContainer_MouseWheel"
+              MouseLeftButtonDown="ImageContainer_MouseDown"
+              MouseLeftButtonUp="ImageContainer_MouseUp"
+              MouseMove="ImageContainer_MouseMove">
+
+            <Image x:Name="MainImage"
+                   Stretch="None"
+                   RenderOptions.BitmapScalingMode="HighQuality"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top">
+                <Image.RenderTransform>
+                    <MatrixTransform x:Name="ImgMatrix"/>
+                </Image.RenderTransform>
+            </Image>
+
+            <Canvas x:Name="CrosshairCanvas" IsHitTestVisible="False"/>
+        </Grid>
+
+        <!-- Toolbar -->
+        <Border Grid.Row="1" Background="#1A1A2E" Padding="8,6"
+                BorderThickness="0,1,0,0" BorderBrush="#0F3460">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                <TextBlock x:Name="TitleLabel" Foreground="#E94560" FontWeight="Bold"
+                           FontSize="13" VerticalAlignment="Center" Margin="0,0,20,0"/>
+
+                <TextBlock Text="SINGOLO:" Foreground="#666" FontSize="11"
+                           VerticalAlignment="Center" Margin="0,0,6,0"/>
+                <Button Content="↺ -90°"  Tag="single_rotL"  Click="Cmd_Click" Style="{StaticResource ToolBtn}"/>
+                <Button Content="↻ +90°"  Tag="single_rotR"  Click="Cmd_Click" Style="{StaticResource ToolBtn}"/>
+                <Button Content="⟷ FlipH" Tag="single_flipH" Click="Cmd_Click" Style="{StaticResource ToolBtn}"/>
+                <Button Content="↕ FlipV" Tag="single_flipV" Click="Cmd_Click" Style="{StaticResource ToolBtn}"/>
+                <Button Content="🔍+"     Tag="single_zoomI" Click="Cmd_Click" Style="{StaticResource ToolBtn}"/>
+                <Button Content="🔍-"     Tag="single_zoomO" Click="Cmd_Click" Style="{StaticResource ToolBtn}"/>
+                <Button Content="⌂ Reset" Tag="single_reset" Click="Cmd_Click" Style="{StaticResource ToolBtn}"/>
+
+                <Separator Width="1" Background="#444" Margin="12,2"/>
+
+                <TextBlock Text="SYNC:" Foreground="#E94560" FontSize="11"
+                           VerticalAlignment="Center" Margin="0,0,6,0"/>
+                <Button Content="↺ -90°"  Tag="sync_rotL"  Click="Cmd_Click" Style="{StaticResource ToolBtnSync}"/>
+                <Button Content="↻ +90°"  Tag="sync_rotR"  Click="Cmd_Click" Style="{StaticResource ToolBtnSync}"/>
+                <Button Content="⟷ FlipH" Tag="sync_flipH" Click="Cmd_Click" Style="{StaticResource ToolBtnSync}"/>
+                <Button Content="↕ FlipV" Tag="sync_flipV" Click="Cmd_Click" Style="{StaticResource ToolBtnSync}"/>
+                <Button Content="🔍+"     Tag="sync_zoomI" Click="Cmd_Click" Style="{StaticResource ToolBtnSync}"/>
+                <Button Content="🔍-"     Tag="sync_zoomO" Click="Cmd_Click" Style="{StaticResource ToolBtnSync}"/>
+                <Button Content="⌂ Reset" Tag="sync_reset" Click="Cmd_Click" Style="{StaticResource ToolBtnSync}"/>
+
+                <Separator Width="1" Background="#444" Margin="12,2"/>
+                <Button Content="✕ Chiudi" Click="BtnClose_Click"
+                        Style="{StaticResource ToolBtn}" Foreground="#E94560"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

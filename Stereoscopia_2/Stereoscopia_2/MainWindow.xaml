@@ -1,0 +1,97 @@
+﻿<Window x:Class="Stereoscopia_2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Stereoscopia — Seleziona Immagini"
+        Height="320" Width="580"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize"
+        Background="#1A1A2E">
+
+    <Window.Resources>
+        <Style x:Key="CardButton" TargetType="Button">
+            <Setter Property="Background" Value="#16213E"/>
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="BorderBrush" Value="#0F3460"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#0F3460"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="STEREOSCOPIA VIEWER"
+                   Foreground="#E94560" FontSize="22" FontWeight="Bold"
+                   HorizontalAlignment="Center"/> <!--LetterSpacing="4"/>-->
+
+        <!-- Immagine Sinistra -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Background="#16213E" BorderBrush="#0F3460"
+                    BorderThickness="1" CornerRadius="6" Padding="10,8">
+                <TextBlock x:Name="TxtLeft" Text="Nessuna immagine selezionata"
+                           Foreground="#888" FontSize="12" VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"/>
+            </Border>
+            <Button Grid.Column="2" Content="📂  Sinistra" Style="{StaticResource CardButton}"
+                    Click="BtnSelectLeft_Click" Width="120"/>
+        </Grid>
+
+        <!-- Immagine Destra -->
+        <Grid Grid.Row="3" Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Background="#16213E" BorderBrush="#0F3460"
+                    BorderThickness="1" CornerRadius="6" Padding="10,8">
+                <TextBlock x:Name="TxtRight" Text="Nessuna immagine selezionata"
+                           Foreground="#888" FontSize="12" VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"/>
+            </Border>
+            <Button Grid.Column="2" Content="📂  Destra" Style="{StaticResource CardButton}"
+                    Click="BtnSelectRight_Click" Width="120"/>
+        </Grid>
+
+        <Button Grid.Row="5" Content="▶  AVVIA VISUALIZZATORI"
+                Style="{StaticResource CardButton}"
+                x:Name="BtnStart"
+                Background="#E94560" Foreground="White"
+                FontWeight="Bold" FontSize="14"
+                Height="44" IsEnabled="False"
+                Click="BtnStart_Click"/>
+    </Grid>
+</Window>
