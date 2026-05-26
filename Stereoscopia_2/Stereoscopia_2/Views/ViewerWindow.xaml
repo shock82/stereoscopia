@@ -66,6 +66,10 @@
                 <Button Content="⌂ Reset" Tag="sync_reset" Click="Cmd_Click" Style="{StaticResource ToolBtnSync}"/>
 
                 <Separator Width="1" Background="#444" Margin="12,2"/>
+                <ToggleButton x:Name="BtnLink" Content="🔗 Ancora" IsChecked="{Binding Linked, Source={x:Static local:SharedTransformState.Instance}}"
+                              Style="{StaticResource ToggleToolBtn}" Margin="0,0,8,0"/>
+                
+                <Separator Width="1" Background="#444" Margin="12,2"/>
                 <Button Content="✕ Chiudi" Click="BtnClose_Click"
                         Style="{StaticResource ToolBtn}" Foreground="#E94560"/>
             </StackPanel>

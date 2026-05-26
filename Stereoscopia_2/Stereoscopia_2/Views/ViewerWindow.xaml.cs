@@ -39,6 +39,7 @@ namespace Stereoscopia_2.Views
         private System.Windows.Point _drawStart;           // punto iniziale in coordinate CANVAS (pre-transform)
         private Shape _currentShape;        // forma in costruzione
         private readonly List<Shape> _shapes = new();
+        private bool _isReceiving = false; // evita loop: A→B→A
 
         public ViewerWindow(string imagePath, string label, bool isFlippedMonitor)
         {
@@ -54,6 +55,9 @@ namespace Stereoscopia_2.Views
             // Le operazioni sync vengono applicate direttamente alla _localMatrix
             // di QUESTO viewer quando arriva la notifica
             _shared.PropertyChanged += OnSharedChanged;
+
+            _shared.PanDelta += OnLinkedPan;
+            _shared.ZoomAt += OnLinkedZoom;
 
             // Init DOPO che la finestra è massimizzata e le dimensioni sono definitive
             ContentRendered += (s, e) => TryInit();
@@ -109,9 +113,18 @@ namespace Stereoscopia_2.Views
 
         private void DoZoom(double factor)
         {
-            var c = ViewportCenter;
-            _localMatrix.ScaleAt(factor, factor, c.X, c.Y);
+            double cx = ImageContainer.ActualWidth / 2.0;
+            double cy = ImageContainer.ActualHeight / 2.0;
+
+            _localMatrix.ScaleAt(factor, factor, cx, cy);
             Apply();
+
+            if (_shared.Linked)
+            {
+                _isReceiving = true;
+                _shared.RaiseZoomAt(factor, cx, cy);
+                _isReceiving = false;
+            }
         }
 
         private void DoRotate(double degrees)
@@ -146,6 +159,32 @@ namespace Stereoscopia_2.Views
             if (_flipH) { var c = ViewportCenter; _localMatrix.ScaleAt(-1, 1, c.X, c.Y); }
             if (_flipV) { var c = ViewportCenter; _localMatrix.ScaleAt(1, -1, c.X, c.Y); }
             Apply();
+        }
+
+        // ── LINKED PAN / ZOOM ricevuti dall'altro viewer ───────────────────────────
+
+        private void OnLinkedPan(double dx, double dy)
+        {
+            if (_isReceiving) return;
+            Dispatcher.Invoke(() =>
+            {
+                _localMatrix.Translate(dx, dy);
+                Apply();
+            });
+        }
+
+        private void OnLinkedZoom(double factor, double cx, double cy)
+        {
+            if (_isReceiving) return;
+            Dispatcher.Invoke(() =>
+            {
+                // cx/cy arrivano dal viewport dell'ALTRO viewer;
+                // usiamo il centro del NOSTRO viewport per coerenza
+                double mcx = ImageContainer.ActualWidth / 2.0;
+                double mcy = ImageContainer.ActualHeight / 2.0;
+                _localMatrix.ScaleAt(factor, factor, mcx, mcy);
+                Apply();
+            });
         }
 
         // ── GESTIONE EVENTI SHARED ────────────────────────────────────────────
@@ -289,7 +328,20 @@ namespace Stereoscopia_2.Views
 
         private void ImageContainer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            DoZoom(e.Delta > 0 ? 1.1 : 1.0 / 1.1);
+            double factor = e.Delta > 0 ? 1.1 : 1.0 / 1.1;
+            double cx = ImageContainer.ActualWidth / 2.0;
+            double cy = ImageContainer.ActualHeight / 2.0;
+
+            _localMatrix.ScaleAt(factor, factor, cx, cy);
+            Apply();
+
+            if (_shared.Linked)
+            {
+                _isReceiving = true;
+                _shared.RaiseZoomAt(factor, cx, cy);
+                _isReceiving = false;
+            }
+
             e.Handled = true;
         }
 
@@ -327,10 +379,22 @@ namespace Stereoscopia_2.Views
                 return;
             }
             if (!_isPanning) return;
+
             var pos = e.GetPosition(ImageContainer);
-            _localMatrix.Translate(pos.X - _panStart.X, pos.Y - _panStart.Y);
+            double dx = pos.X - _panStart.X;
+            double dy = pos.Y - _panStart.Y;
             _panStart = pos;
+
+            _localMatrix.Translate(dx, dy);
             Apply();
+
+            // Propaga all'altro viewer se linked
+            if (_shared.Linked)
+            {
+                _isReceiving = true;
+                _shared.RaisePanDelta(dx, dy);
+                _isReceiving = false;
+            }
         }
 
         // ── MIRINO ────────────────────────────────────────────────────────────

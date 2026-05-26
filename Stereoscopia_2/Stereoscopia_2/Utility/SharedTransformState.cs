@@ -27,5 +27,19 @@ namespace Stereoscopia_2.Utility
         {
             if (!Equals(field, value)) { field = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); }
         }
+
+        // Evento per propagare zoom/pan in tempo reale tra i due viewer
+        public event Action<double, double> PanDelta;        // dx, dy
+        public event Action<double, double, double> ZoomAt;  // factor, cx, cy
+
+        public void RaisePanDelta(double dx, double dy) => PanDelta?.Invoke(dx, dy);
+        public void RaiseZoomAt(double f, double cx, double cy) => ZoomAt?.Invoke(f, cx, cy);
+
+        private bool _linked = false;
+        public bool Linked
+        {
+            get => _linked;
+            set => SetProp(ref _linked, value);
+        }
     }
 }
