@@ -60,7 +60,7 @@
                 <!-- Label SX -->
                 <Border Grid.Column="0" Background="#E9456022" CornerRadius="4"
                         Padding="8,3" Margin="0,0,8,0">
-                    <TextBlock Text="◀ SINISTRA" Foreground="#E94560"
+                    <TextBlock Text="MASTER" Foreground="#E94560"
                                FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
                 </Border>
 
@@ -84,7 +84,7 @@
 
                 <!-- Label DX -->
                 <Border Grid.Column="3" Background="#4FC3F722" CornerRadius="4" Padding="8,3" Margin="8,0,0,0">
-                    <TextBlock Text="DESTRA ▶" Foreground="#4FC3F7" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
+                    <TextBlock Text="SLAVE" Foreground="#4FC3F7" FontWeight="Bold" FontSize="12" VerticalAlignment="Center"/>
                 </Border>
 
                 <!-- Comandi DX -->

@@ -1,13 +1,17 @@
 ﻿<Window x:Class="Stereoscopia_2.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Stereoscopia_2.Utility"
         Title="Stereoscopia — Seleziona Immagini"
-        Height="320" Width="580"
+        Height="590" Width="740"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanMinimize"
         Background="#1A1A2E">
 
     <Window.Resources>
+        <local:DisplayNameConverter x:Key="displayNameConv"/>
+
+        <!-- Pulsante principale -->
         <Style x:Key="CardButton" TargetType="Button">
             <Setter Property="Background" Value="#16213E"/>
             <Setter Property="Foreground" Value="#E0E0E0"/>
@@ -15,6 +19,7 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="12,8"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="12"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -36,62 +41,240 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- RadioButton stile pill -->
+        <Style x:Key="PillRadio" TargetType="RadioButton">
+            <Setter Property="Foreground" Value="#888"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Bd"
+                                Background="#16213E"
+                                BorderBrush="#0F3460"
+                                BorderThickness="1"
+                                CornerRadius="5"
+                                Padding="18,7">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#E94560"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#E94560"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#0F3460"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#E94560"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Label sezione -->
+        <Style x:Key="SectionLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#555"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+
+        <!-- ComboBox styled -->
+        <Style x:Key="StyledCombo" TargetType="ComboBox">
+            <Setter Property="Background" Value="#16213E"/>
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="BorderBrush" Value="#0F3460"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
     </Window.Resources>
 
-    <Grid Margin="30">
+    <Grid Margin="36,28,36,28">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="20"/>
+            <!-- Titolo -->
+            <RowDefinition Height="24"/>
             <RowDefinition Height="Auto"/>
+            <!-- Sezione immagini -->
+            <RowDefinition Height="16"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="30"/>
+            <!-- Sezione tipo strumento -->
+            <RowDefinition Height="16"/>
             <RowDefinition Height="Auto"/>
+            <!-- Sezione display -->
+            <RowDefinition Height="28"/>
+            <RowDefinition Height="Auto"/>
+            <!-- Avvia -->
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="STEREOSCOPIA VIEWER"
-                   Foreground="#E94560" FontSize="22" FontWeight="Bold"
-                   HorizontalAlignment="Center"/> <!--LetterSpacing="4"/>-->
+        <!-- ── TITOLO ─────────────────────────────────────────────────────── -->
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center">
+            <TextBlock Text="STEREOSCOPIA VIEWER"
+                       Foreground="#E94560" FontSize="24" FontWeight="Bold"
+                       HorizontalAlignment="Center"/>
+            <Rectangle Height="2" Width="200" Margin="0,6,0,0">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="Transparent" Offset="0"/>
+                        <GradientStop Color="#E94560"     Offset="0.5"/>
+                        <GradientStop Color="Transparent" Offset="1"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+        </StackPanel>
 
-        <!-- Immagine Sinistra -->
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" Background="#16213E" BorderBrush="#0F3460"
-                    BorderThickness="1" CornerRadius="6" Padding="10,8">
-                <TextBlock x:Name="TxtLeft" Text="Nessuna immagine selezionata"
-                           Foreground="#888" FontSize="12" VerticalAlignment="Center"
-                           TextTrimming="CharacterEllipsis"/>
-            </Border>
-            <Button Grid.Column="2" Content="📂  Sinistra" Style="{StaticResource CardButton}"
-                    Click="BtnSelectLeft_Click" Width="120"/>
-        </Grid>
+        <!-- ── SEZIONE IMMAGINI ───────────────────────────────────────────── -->
+        <Border Grid.Row="2" Background="#12122A" BorderBrush="#0F3460"
+                BorderThickness="1" CornerRadius="8" Padding="16,14">
+            <StackPanel>
 
-        <!-- Immagine Destra -->
-        <Grid Grid.Row="3" Margin="0,10,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" Background="#16213E" BorderBrush="#0F3460"
-                    BorderThickness="1" CornerRadius="6" Padding="10,8">
-                <TextBlock x:Name="TxtRight" Text="Nessuna immagine selezionata"
-                           Foreground="#888" FontSize="12" VerticalAlignment="Center"
-                           TextTrimming="CharacterEllipsis"/>
-            </Border>
-            <Button Grid.Column="2" Content="📂  Destra" Style="{StaticResource CardButton}"
-                    Click="BtnSelectRight_Click" Width="120"/>
-        </Grid>
+                <TextBlock Text="IMMAGINI" Style="{StaticResource SectionLabel}"/>
 
-        <Button Grid.Row="5" Content="▶  AVVIA VISUALIZZATORI"
-                Style="{StaticResource CardButton}"
+                <!-- Sinistra -->
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="110"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="◀ MASTER"
+                               Foreground="#E94560" FontWeight="Bold" FontSize="11"
+                               VerticalAlignment="Center"/>
+                    <Border Grid.Column="1" Background="#16213E" BorderBrush="#0F3460"
+                            BorderThickness="1" CornerRadius="5" Padding="10,7">
+                        <TextBlock x:Name="TxtLeft" Text="Nessuna immagine selezionata"
+                                   Foreground="#555" FontSize="12" VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Border>
+                    <Button Grid.Column="3" Content="📂  Master"
+                            Style="{StaticResource CardButton}"
+                            Click="BtnSelectLeft_Click"/>
+                </Grid>
+
+                <!-- Destra -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="110"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="SLAVE ▶"
+                               Foreground="#4FC3F7" FontWeight="Bold" FontSize="11"
+                               VerticalAlignment="Center"/>
+                    <Border Grid.Column="1" Background="#16213E" BorderBrush="#0F3460"
+                            BorderThickness="1" CornerRadius="5" Padding="10,7">
+                        <TextBlock x:Name="TxtRight" Text="Nessuna immagine selezionata"
+                                   Foreground="#555" FontSize="12" VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Border>
+                    <Button Grid.Column="3" Content="📂  Slave"
+                            Style="{StaticResource CardButton}"
+                            Click="BtnSelectRight_Click"/>
+                </Grid>
+
+            </StackPanel>
+        </Border>
+
+        <!-- ── SEZIONE TIPO STRUMENTO ─────────────────────────────────────── -->
+        <Border Grid.Row="4" Background="#12122A" BorderBrush="#0F3460"
+                BorderThickness="1" CornerRadius="8" Padding="16,14">
+            <StackPanel>
+                <TextBlock Text="TIPO STRUMENTO" Style="{StaticResource SectionLabel}"/>
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton Content="PLANAR"
+                                 GroupName="machineType"
+                                 IsChecked="{Binding MachineTypePlanar}"
+                                 Style="{StaticResource PillRadio}"/>
+                    <RadioButton Content="PLURAVIEW"
+                                 GroupName="machineType"
+                                 IsChecked="{Binding MachineTypePluraview}"
+                                 Style="{StaticResource PillRadio}"
+                                 Margin="10,0,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- ── SEZIONE DISPLAY ────────────────────────────────────────────── -->
+        <Border Grid.Row="6" Background="#12122A" BorderBrush="#0F3460"
+                BorderThickness="1" CornerRadius="8" Padding="16,14">
+            <StackPanel>
+                <TextBlock Text="CONFIGURAZIONE DISPLAY" Style="{StaticResource SectionLabel}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="24"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="24"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Master -->
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="MASTER" Foreground="#E94560"
+                                   FontSize="10" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding AllDisplay}"
+                                  SelectedItem="{Binding Display_1}"
+                                  Style="{StaticResource StyledCombo}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource displayNameConv}}"
+                                               Foreground="#000"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- Freccia -->
+                    <TextBlock Grid.Column="1" Text="↔" Foreground="#444"
+                               FontSize="16" HorizontalAlignment="Center"
+                               VerticalAlignment="Bottom" Margin="0,0,0,7"/>
+
+                    <!-- Slave -->
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="SLAVE" Foreground="#4FC3F7"
+                                   FontSize="10" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding AllDisplay}"
+                                  SelectedItem="{Binding Display_2}"
+                                  Style="{StaticResource StyledCombo}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource displayNameConv}}"
+                                               Foreground="#000"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- Identifica -->
+                    <Button Grid.Column="4" x:Name="btnIdentifica"
+                            Content="⊹ Identifica"
+                            Click="btnIdentifica_Click"
+                            Style="{StaticResource CardButton}"
+                            VerticalAlignment="Bottom"
+                            Margin="0,0,0,0"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- ── AVVIA ──────────────────────────────────────────────────────── -->
+        <Button Grid.Row="8"
                 x:Name="BtnStart"
+                Content="▶   AVVIA VISUALIZZATORI"
+                Style="{StaticResource CardButton}"
                 Background="#E94560" Foreground="White"
                 FontWeight="Bold" FontSize="14"
-                Height="44" IsEnabled="False"
+                Height="46" IsEnabled="False"
                 Click="BtnStart_Click"/>
+
     </Grid>
 </Window>
