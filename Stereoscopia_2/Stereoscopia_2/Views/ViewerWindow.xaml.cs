@@ -12,6 +12,8 @@ namespace Stereoscopia_2.Views
         private readonly SharedTransformState _shared = SharedTransformState.Instance;
         private readonly bool _isFlippedMonitor;
 
+        public ViewerWindow Peer { get; set; }
+
         // _localMatrix contiene TUTTO lo stato visivo corrente di questo viewer.
         // Non viene mai ricostruita da parametri: ogni operazione la modifica direttamente.
         private Matrix _localMatrix = Matrix.Identity;
@@ -40,12 +42,13 @@ namespace Stereoscopia_2.Views
         private Shape _currentShape;        // forma in costruzione
         private readonly List<Shape> _shapes = new();
         private bool _isReceiving = false; // evita loop: A→B→A
+        private bool _syncActive = false;
 
         public ViewerWindow(string imagePath, string label, bool isFlippedMonitor)
         {
             InitializeComponent();
             _isFlippedMonitor = isFlippedMonitor;
-            TitleLabel.Text = label;
+            //TitleLabel.Text = label;
             MainImage.Source = ImageLoader.Load(imagePath);
 
             if (isFlippedMonitor) { _flipH = true; _flipV = true; }
@@ -95,6 +98,38 @@ namespace Stereoscopia_2.Views
 
             Apply();
             _ready = true;
+        }
+
+        // ── INIT TOOLBAR (chiamato da MainWindow sul viewer sinistro) ──────────
+
+        public void InitAsMain()
+        {
+            MainToolbar.Visibility = Visibility.Visible;
+
+            foreach (var hex in PaletteHex)
+            {
+                var color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex);
+                var brush = new SolidColorBrush(color);
+                var border = new Border
+                {
+                    Width = 20,
+                    Height = 20,
+                    CornerRadius = new CornerRadius(10),
+                    Background = brush,
+                    BorderBrush = System.Windows.Media.Brushes.Transparent,
+                    BorderThickness = new Thickness(2),
+                    Margin = new Thickness(2),
+                    Cursor = System.Windows.Input.Cursors.Hand,
+                    Tag = brush
+                };
+                ColorPicker.Items.Add(new ListBoxItem
+                {
+                    Content = border,
+                    Padding = new Thickness(0),
+                    Tag = brush
+                });
+            }
+            ColorPicker.SelectedIndex = 0;
         }
 
         // ── APPLICA MATRICE ───────────────────────────────────────────────────
@@ -253,7 +288,64 @@ namespace Stereoscopia_2.Views
 
         // ── COMANDI TOOLBAR ───────────────────────────────────────────────────
 
+        private void BtnSync_Checked(object sender, RoutedEventArgs e)
+        {
+            _syncActive = true;
+            // Evidenzia visivamente i due gruppi di pulsanti
+            HighlightSyncState(true);
+        }
+
+        private void BtnSync_Unchecked(object sender, RoutedEventArgs e)
+        {
+            _syncActive = false;
+            HighlightSyncState(false);
+        }
+
+        private void HighlightSyncState(bool active)
+        {
+            // Quando sync è attivo i bordi dei due pannelli si colorano uguali
+            // (opzionale, puramente estetico)
+        }
+
         private void Cmd_Click(object sender, RoutedEventArgs e)
+        {
+            string tag = (sender as System.Windows.Controls.Button)?.Tag?.ToString() ?? "";
+            // Separa prefisso (L_ o R_) dal comando
+            string prefix = tag.Length > 2 ? tag[..2] : "L_";   // "L_" o "R_"
+            string cmd = tag.Length > 2 ? tag[2..] : tag;     // "rotL", "flipH", ecc.
+
+            if (_syncActive)
+            {
+                // Sync: entrambi i viewer eseguono lo stesso comando
+                RunCmd(cmd);          // questo viewer (sinistro)
+                Peer?.RunCmd(cmd);    // viewer destro
+            }
+            else
+            {
+                // Senza sync: il comando va al viewer indicato dal prefisso
+                if (prefix == "L_")
+                    RunCmd(cmd);          // sinistra = questo viewer
+                else
+                    Peer?.RunCmd(cmd);    // destra = peer
+            }
+        }
+
+        // Esegue un comando su questo viewer
+        public void RunCmd(string cmd)
+        {
+            switch (cmd)
+            {
+                case "rotL": DoRotate(-90); break;
+                case "rotR": DoRotate(90); break;
+                case "flipH": DoFlipH(); break;
+                case "flipV": DoFlipV(); break;
+                case "zoomI": DoZoom(1.25); break;
+                case "zoomO": DoZoom(1.0 / 1.25); break;
+                case "reset": DoReset(); break;
+            }
+        }
+
+        private void Cmd_Click_OLD(object sender, RoutedEventArgs e)
         {
             string tag = (sender as System.Windows.Controls.Button)?.Tag?.ToString() ?? "";
             bool isSync = tag.StartsWith("sync_");
@@ -329,19 +421,13 @@ namespace Stereoscopia_2.Views
         private void ImageContainer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             double factor = e.Delta > 0 ? 1.1 : 1.0 / 1.1;
-            double cx = ImageContainer.ActualWidth / 2.0;
-            double cy = ImageContainer.ActualHeight / 2.0;
-
-            _localMatrix.ScaleAt(factor, factor, cx, cy);
-            Apply();
-
-            if (_shared.Linked)
+            DoZoom(factor);
+            if (_syncActive && !_isReceiving)
             {
                 _isReceiving = true;
-                _shared.RaiseZoomAt(factor, cx, cy);
+                _shared.RaiseZoomAt(factor, 0, 0);
                 _isReceiving = false;
             }
-
             e.Handled = true;
         }
 
@@ -385,16 +471,20 @@ namespace Stereoscopia_2.Views
             double dy = pos.Y - _panStart.Y;
             _panStart = pos;
 
-            _localMatrix.Translate(dx, dy);
-            Apply();
+            DoPan(dx, dy);
 
-            // Propaga all'altro viewer se linked
-            if (_shared.Linked)
+            if (_syncActive && !_isReceiving)
             {
                 _isReceiving = true;
                 _shared.RaisePanDelta(dx, dy);
                 _isReceiving = false;
             }
+        }
+
+        public void DoPan(double dx, double dy)
+        {
+            _localMatrix.Translate(dx, dy);
+            Apply();
         }
 
         // ── MIRINO ────────────────────────────────────────────────────────────
@@ -446,19 +536,19 @@ namespace Stereoscopia_2.Views
         public void InitDrawingTools()
         {
             // Popola la palette colori
-            foreach (var hex in PaletteHex)
-            {
-                var item = new ListBoxItem
-                {
-                    Tag = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex)),
-                    Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex))
-                };
-                ColorPicker.Items.Add(item);
-            }
-            ColorPicker.SelectedIndex = 0;
+            //foreach (var hex in PaletteHex)
+            //{
+            //    var item = new ListBoxItem
+            //    {
+            //        Tag = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex)),
+            //        Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex))
+            //    };
+            //    ColorPicker.Items.Add(item);
+            //}
+            //ColorPicker.SelectedIndex = 0;
 
-            DrawToolbar.Visibility = Visibility.Visible;
-
+            //DrawToolbar.Visibility = Visibility.Visible;
+            RbLine.IsChecked = true;
             // Sincronizza DrawMatrix con ImgMatrix
             DrawMatrix.Matrix = ImgMatrix.Matrix;
         }
@@ -468,6 +558,7 @@ namespace Stereoscopia_2.Views
             _drawMode = true;
             DrawingCanvas.IsHitTestVisible = true;
             ImageContainer.Cursor = System.Windows.Input.Cursors.Cross;
+            DrawToolbar.Visibility = Visibility.Visible;
         }
 
         private void DrawMode_Unchecked(object sender, RoutedEventArgs e)
@@ -481,6 +572,7 @@ namespace Stereoscopia_2.Views
                 DrawingCanvas.Children.Remove(_currentShape);
                 _currentShape = null;
             }
+            DrawToolbar.Visibility = Visibility.Collapsed;
         }
 
         private System.Windows.Media.Brush SelectedBrush =>
@@ -584,6 +676,14 @@ namespace Stereoscopia_2.Views
                     SaveImageWithDrawings();
                     break;
             }
+        }
+
+        private void ColorPicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            foreach (ListBoxItem item in ColorPicker.Items)
+                if (item.Content is Border b) b.BorderBrush = System.Windows.Media.Brushes.Transparent;
+            if (ColorPicker.SelectedItem is ListBoxItem sel && sel.Content is Border border)
+                border.BorderBrush = System.Windows.Media.Brushes.White;
         }
 
         // ── SALVATAGGIO ───────────────────────────────────────────────────────────

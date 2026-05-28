@@ -46,6 +46,10 @@ namespace Stereoscopia_2
             var left = new ViewerWindow(_leftPath, "SINISTRA", isFlippedMonitor: false);
             var right = new ViewerWindow(_rightPath, "DESTRA", isFlippedMonitor: screens.Length > 1);
 
+            // Collegamento peer
+            left.Peer = right;
+            right.Peer = left;
+
             // Imposta posizione PRIMA di Show(), senza Maximized
             PlaceOnScreen(left, screens[0]);
             PlaceOnScreen(right, screens.Length > 1 ? screens[1] : screens[0]);
@@ -58,6 +62,8 @@ namespace Stereoscopia_2
             right.WindowState = WindowState.Maximized;
 
             left.InitDrawingTools();
+            // Toolbar solo sul viewer sinistro
+            left.InitAsMain();
 
             this.Hide();
         }
